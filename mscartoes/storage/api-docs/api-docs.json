@@ -1,0 +1,763 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API - MSCARTOES",
+        "description": "User Management API",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/",
+            "description": "Local Server"
+        }
+    ],
+    "paths": {
+        "/mscartoes/cartoes": {
+            "get": {
+                "summary": "Buscar lista de cartões de crédito cadastrados ",
+                "description": "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><li><p><b>NOTA <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></li><li><p><b>INFORMAÇÃO COMPLEMENTAR: </b>esse endpoint não exige parâmetros!</p></li></ul>",
+                "operationId": "6239efa947b2ee02f25e72abab6abee8",
+                "responses": {
+                    "200": {
+                        "description": "Busca de cartões com sucesso!<p><b>Pós-condição</b></p><p>Retorna lista de todos os cartões de crédito cadastrados no microsserviço MSCARTOES, contendo os dados no formato de objeto { id, nome, bandeira, renda } .</p><p><b>NOTA: </b>Se não houver algum cartão de crédito previamente cadastrado no microsserviço MSCARTOES, será retornado um array vazio.</p>",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "number",
+                                                "example": "0"
+                                            },
+                                            "nome": {
+                                                "type": "string",
+                                                "example": "nome_cartão"
+                                            },
+                                            "bandeira": {
+                                                "type": "string",
+                                                "example": "nome_bandeira"
+                                            },
+                                            "renda": {
+                                                "type": "number",
+                                                "example": "0000.00"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized | Token expirado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Acesso não autorizado/token expirado!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal Server Error | Preenchimento vazio ou token de formato inválido!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de formato inválido!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Error: Service Unavailable | Serviços externos indisponíveis (cartões e cache)",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "examples": {
+                                    "servico_dados": {
+                                        "summary": "Erro Serviço Cartões",
+                                        "value": {
+                                            "status": "error_cards",
+                                            "message": "Serviço temporariamente indisponível. Tente novamente em instantes."
+                                        }
+                                    },
+                                    "servico_redis": {
+                                        "summary": "Erro Serviço Cache",
+                                        "value": {
+                                            "status": "error_cache",
+                                            "message": "Serviço de cache de tokens temporariamente indisponível! Tente novamente em instantes!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "summary": "Cadastrar novo cartão de crédito",
+                "description": "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><li><p><b>NOTA <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></li></ul>",
+                "operationId": "a920e04d2b07e5927b1f622cb84e74ed",
+                "requestBody": {
+                    "description": "Dados do cartão<p><b>Pré-condição</b></p><ul><li><p>os dados do cartão devem ser preenchidos no corpo da requisição (dentro do json).</p></li><li><p><b>NOTA 1 <sup>nome</sup>: </b>o nome do cartão possui limite máximo de até 50 caracteres.</p></li><li><p><b>NOTA 2 <sup>bandeira</sup>: </b>o nome da bandeira a ser preenchido é do tipo <i>enumerado</i>, e as bandeiras estão definidas na opção <b>Schema</b>. Qualquer nome de bandeira que seja diferente das opções do tipo enumerado, a API retornará um erro de validação cód HTTP 422 .</p></li><li><p><b>NOTA 3 <sup>renda</sup>: </b>preencha somente com números (utilizando o ponto '.' como separador dos centavos) a renda do cartão (EX.: preencher o valor 1500.00 no atributo renda, equivale ao valor R$ 1.500,00).</p></li></ul>",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nome",
+                                    "bandeira",
+                                    "renda"
+                                ],
+                                "properties": {
+                                    "nome": {
+                                        "type": "string",
+                                        "example": "nome_cartão"
+                                    },
+                                    "bandeira": {
+                                        "description": "bandeira do cartão",
+                                        "type": "enum",
+                                        "enum": [
+                                            "visa",
+                                            "mastercard",
+                                            "amex",
+                                            "elo",
+                                            "hipercard",
+                                            "discover",
+                                            "dinersclub",
+                                            "jcb",
+                                            "credz",
+                                            "sorocred",
+                                            "cabal",
+                                            "banescard"
+                                        ],
+                                        "example": "bandeira_enum"
+                                    },
+                                    "renda": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 0
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Cartão cadastrado com sucesso!</b><p><b>Pós-condição</b></p><p>Retorno de uma resposta em json contendo os dados do cartão  no formato objeto { id, nome, bandeira, renda } .</p>",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "number",
+                                            "example": "0"
+                                        },
+                                        "nome": {
+                                            "type": "string",
+                                            "example": "nome_cartao"
+                                        },
+                                        "bandeira": {
+                                            "type": "enum",
+                                            "example": "nome_bandeira"
+                                        },
+                                        "renda": {
+                                            "type": "number",
+                                            "example": 0
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized | Token expirado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Acesso não autorizado/token expirado!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error: Unprocessable Content | Erro de validação. Conteúdo JSON da requisição possui erros semânticos ou lógicos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "examples": {
+                                    "preencha_nome": {
+                                        "summary": "Erro no nome",
+                                        "value": {
+                                            "message": [
+                                                "Informe o nome do cartão!",
+                                                "Tamanho máximo nome do cartão não pode exceder 50 caracteres!"
+                                            ],
+                                            "errors": {
+                                                "nome": [
+                                                    "Informe o nome do cartão!",
+                                                    "Tamanho máximo nome do cartão não pode exceder 50 caracteres!"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "preencha_bandeira": {
+                                        "summary": "Erro na bandeira",
+                                        "value": {
+                                            "message": [
+                                                "Informe o nome da bandeira!",
+                                                "Nome da bandeira inválido!"
+                                            ],
+                                            "errors": {
+                                                "bandeira": [
+                                                    "Informe o nome da bandeira!",
+                                                    "Nome da bandeira inválido!"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "preencha_renda": {
+                                        "summary": "Erro na renda",
+                                        "value": {
+                                            "message": [
+                                                "Informe a renda mínima desse cartão!",
+                                                "Informe a renda mínima do cartão em formato numérico!"
+                                            ],
+                                            "errors": {
+                                                "renda": [
+                                                    "Informe a renda mínima desse cartão!",
+                                                    "Informe a renda mínima do cartão em formato numérico!"
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal Server Error | Preenchimento vazio ou token de formato inválido!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de formato inválido!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Error: Service Unavailable | Serviços externos indisponíveis (cartões e cache)",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "examples": {
+                                    "servico_dados": {
+                                        "summary": "Erro Serviço Cartões",
+                                        "value": {
+                                            "status": "error_cards",
+                                            "message": "Serviço temporariamente indisponível. Tente novamente em instantes."
+                                        }
+                                    },
+                                    "servico_redis": {
+                                        "summary": "Erro Serviço Cache",
+                                        "value": {
+                                            "status": "error_cache",
+                                            "message": "Serviço de cache de tokens temporariamente indisponível! Tente novamente em instantes!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/mscartoes/cartoes/{id}": {
+            "get": {
+                "summary": "Retornar cartão pelo id ",
+                "description": "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><li><p><b>NOTA 1 <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></li><li><p><b>id: </b>informar id do cartão de crédito.</p></li><li><p><b>NOTA 2 <sup>id</sup>: </b>para preencher o id, o cartão de crédito precisa estar previamente cadastrado no microsserviço MSCARTOES.</p></li></ul>",
+                "operationId": "8fb6f5667ea9942dadc2f355ac27e1c9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Cartão encontrado com sucesso!<p><b>Pós-condição</b></p><p>Retorno de uma resposta em json contendo os dados do cartão no formato objeto { id, nome, bandeira, renda } .</p>",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "number",
+                                            "example": "0"
+                                        },
+                                        "nome": {
+                                            "type": "string",
+                                            "example": "nome_cartão"
+                                        },
+                                        "bandeira": {
+                                            "type": "string",
+                                            "example": "nome_bandeira"
+                                        },
+                                        "renda": {
+                                            "type": "number",
+                                            "example": "0000.00"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error: Bad Request | Parâmetro id de cartão inválido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "O id do cartão precisa ser um número válido!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized | Token expirado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Acesso não autorizado/token expirado!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Error: Not Found | Cartão não encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "not_found"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cartão não encontrado!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal Server Error | Preenchimento vazio ou token de formato inválido!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de formato inválido!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Error: Service Unavailable | Serviços externos indisponíveis (cartões e cache)",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "examples": {
+                                    "servico_dados": {
+                                        "summary": "Erro Serviço Cartões",
+                                        "value": {
+                                            "status": "error_cards",
+                                            "message": "Serviço temporariamente indisponível. Tente novamente em instantes."
+                                        }
+                                    },
+                                    "servico_redis": {
+                                        "summary": "Erro Serviço Cache",
+                                        "value": {
+                                            "status": "error_cache",
+                                            "message": "Serviço de cache de tokens temporariamente indisponível! Tente novamente em instantes!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "summary": "Atualizar dados (parciais) de cartão de crédito",
+                "description": "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><li><p><b>NOTA 1 <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></li><li><p><b>id: </b>informar id do cartão de crédito.</p></li><li><p><b>NOTA 2 <sup>id</sup>: </b>para preencher o id, o cartão de crédito precisa estar previamente cadastrado no microsserviço MSCARTOES.</p></li></ul>",
+                "operationId": "4f1f5472ac7ad701e2e9cdea3e00e42b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "<p><b>Pré-condição:</b></p><ul><li><p>preenchimento de forma parcial do json no corpo da requisição (nome, bandeira, renda).</p></li><li><p><b>NOTA 1: </b>o preenchimento dos atributos do json não são obrigatórios. Entretanto, se forem preenchidos para serem alterados/atualizados, a API irá aplicar as regras de validação em cada atributo.</p></li><li><p><b>NOTA 2 <sup>bandeira</sup>: </b>o nome da bandeira é do tipo enumerado, e as bandeiras estão definidas na opção <b>Schema .</b></p></li><li><p><b>NOTA 3 <sup>renda</sup>: </b>preencha somente com números (utilizando o ponto '.' como separador dos centavos) a renda do cartão (EX.: preencher o valor 1500.00 no atributo renda, equivale ao valor R$ 1.500,00).</p></li><li><p><b>INFORMAÇÃO COMPLEMENTAR: </b>não preenchendo os atributos no corpo da requisição, será retornado um json de resposta contendo os dados do cartão.</li></ul>",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nome",
+                                    "bandeira",
+                                    "renda"
+                                ],
+                                "properties": {
+                                    "nome": {
+                                        "type": "string",
+                                        "example": ""
+                                    },
+                                    "bandeira": {
+                                        "type": "enum",
+                                        "enum": [
+                                            "visa",
+                                            "mastercard",
+                                            "amex",
+                                            "elo",
+                                            "hipercard",
+                                            "discover",
+                                            "dinersclub",
+                                            "jcb",
+                                            "credz",
+                                            "sorocred",
+                                            "cabal",
+                                            "banescard"
+                                        ],
+                                        "example": ""
+                                    },
+                                    "renda": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 0
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Atualizar um cartão com sucesso!<p><b>Pós-condição</b></p><p></p>Retornado um json de resposta contendo os dados do cartão no formato objeto { id, nome, bandeira, renda } .</p>",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "number",
+                                                "example": "0"
+                                            },
+                                            "nome": {
+                                                "type": "string",
+                                                "example": "nome_cartao"
+                                            },
+                                            "bandeira": {
+                                                "type": "",
+                                                "example": "nome_bandeira"
+                                            },
+                                            "renda": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": "0000.00"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error: Bad Request | Parâmetro id de cartão inválido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "O id do cartão precisa ser um número válido!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized | Token expirado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Acesso não autorizado/token expirado!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Error: Not Found | Cartão não encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "not_found"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cartão não encontrado!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error: Unprocessable Content | Erro de validação. Conteúdo JSON da requisição possui erros semânticos ou lógicos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "examples": {
+                                    "preencha_nome": {
+                                        "summary": "Erro no nome",
+                                        "value": {
+                                            "message": "Tamanho máximo nome do cartão não pode exceder 50 caracteres!",
+                                            "errors": {
+                                                "nome": [
+                                                    "Tamanho máximo nome do cartão não pode exceder 50 caracteres!"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "preencha_bandeira": {
+                                        "summary": "Erro na bandeira",
+                                        "value": {
+                                            "message": [
+                                                "Nome da bandeira inválido!"
+                                            ],
+                                            "errors": {
+                                                "bandeira": [
+                                                    "Nome da bandeira inválido!"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "preencha_renda": {
+                                        "summary": "Erro na renda",
+                                        "value": {
+                                            "message": "Informe a renda do cartão em formato numérico!",
+                                            "errors": {
+                                                "renda": [
+                                                    "Informe a renda do cartão em formato numérico!"
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal Server Error | Preenchimento vazio ou token de formato inválido!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de formato inválido!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Error: Service Unavailable | Serviços externos indisponíveis (cartões e cache)",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "examples": {
+                                    "servico_dados": {
+                                        "summary": "Erro Serviço Cartões",
+                                        "value": {
+                                            "status": "error_cards",
+                                            "message": "Serviço temporariamente indisponível. Tente novamente em instantes."
+                                        }
+                                    },
+                                    "servico_redis": {
+                                        "summary": "Erro Serviço Cache",
+                                        "value": {
+                                            "status": "error_cache",
+                                            "message": "Serviço de cache de tokens temporariamente indisponível! Tente novamente em instantes!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    }
+}

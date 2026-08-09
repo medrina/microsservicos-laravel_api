@@ -1,0 +1,1480 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API - MSCLIENTES",
+        "description": "User Management API",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/",
+            "description": "Local Server"
+        }
+    ],
+    "paths": {
+        "/msclientes/clientes": {
+            "get": {
+                "summary": "Retorna todos os clientes",
+                "description": "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><li><p><b>NOTA <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></li><li><p><b>INFORMAÇÃO COMPLEMENTAR: </b>esse endpoint não exige parâmetros!</p></li></ul>",
+                "operationId": "03c486a3237810bcf2aa094a7e14ec54",
+                "responses": {
+                    "200": {
+                        "description": "Retorna lista de clientes ativos<p><b>Pós-condição:</b></p><p>Retorna um array contendo todos os clientes ativos em formato de objeto { id, cpf, nome, data_nasc, email }.</p><ul><li><p><b>NOTA: </b>Caso não existam registros de clientes cadastrados na base de dados no microsserviço MSCLIENTES, o retorno será um array vazio.</p></li><br><li><p><b>INFORMAÇÃO COMPLEMENTAR: </b>os <i>clientes ativos</i>, significa os clientes que não foram apagados, e encontram-se ativos. A API enxerga esses clientes que estão ativos, tornando-os habilitados nos endpoints de buscas e em avaliações de crédito.<br>Clientes que foram apagados, a API não enxerga mais nos endpoints de busca e avaliações de crédito.<p>Para reativar clientes que foram apagados, você precisa consultar sobre a situação cadastral do cliente informando o CPF dele no endpoint: <b>GET - Pesquisar por situação cadastral de cliente pelo seu CPF</b> no microsserviço MSCLIENTES.</p></li></ul>",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "number",
+                                                "example": "0"
+                                            },
+                                            "cpf": {
+                                                "type": "string",
+                                                "example": "99999999999"
+                                            },
+                                            "nome": {
+                                                "type": "string",
+                                                "example": "user"
+                                            },
+                                            "data_nasc": {
+                                                "type": "string",
+                                                "example": "YYYY-MM-DD"
+                                            },
+                                            "email": {
+                                                "type": "string",
+                                                "example": "user@email.com"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized | Token expirado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Acesso não autorizado/token expirado!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal Server Error | Preenchimento vazio ou token de formato inválido!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de formato inválido!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Error: Service Unavailable | Serviços externos indisponíveis (clientes e cache)",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "examples": {
+                                    "servico_dados": {
+                                        "summary": "Erro Serviço Clientes",
+                                        "value": {
+                                            "status": "error_clients",
+                                            "message": "Serviço temporariamente indisponível. Tente novamente em instantes."
+                                        }
+                                    },
+                                    "servico_redis": {
+                                        "summary": "Erro Serviço Cache",
+                                        "value": {
+                                            "status": "error_cache",
+                                            "message": "Serviço de cache de tokens temporariamente indisponível! Tente novamente em instantes!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "summary": "Cadastrar novo cliente",
+                "description": "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><li><p><b>NOTA <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></li></ul>",
+                "operationId": "7533cfdf40be65d9ce9d1faafc81afc0",
+                "requestBody": {
+                    "description": "<p><b>Pré-condição:</b></p><ul><li><p>dados de cliente preenchidos nos atributos do json (conforme exemplo abaixo).</p></li><li><p><b>NOTA 1: </b>a API aplicará as regras de validação nos atributos do json da requisição.</p></li><li><p><b>NOTA 2 <sup>cpf</sup>: </b>o CPF do cliente precisa seguir o formato de <b>11 dígitos numéricos.</b></p></li><li><p><b>NOTA 3 <sup>cpf</sup>: </b>não é possível cadastrar um CPF do cliente já existente na base de dados.</p></li><li><p><b>NOTA 4 <sup>data_nasc</sup>: </b>a data de nascimento do cliente deve seguir o formato: <b>YYYY-MM-DD.</b></p></li><li><p><b>NOTA 5 <sup>email</sup>: </b>para cadastrar um email do cliente, ele precisa seguir o formato de email: <b>user@email.com</b></p></li><li><p><b>NOTA 6 <sup>email</sup>: </b>não é possível cadastrar um email do cliente já existente na base de dados!</p></li></ul>",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "cpf",
+                                    "nome",
+                                    "data_nasc",
+                                    "email"
+                                ],
+                                "properties": {
+                                    "cpf": {
+                                        "type": "string",
+                                        "example": "99999999999"
+                                    },
+                                    "nome": {
+                                        "type": "string",
+                                        "example": "user"
+                                    },
+                                    "data_nasc": {
+                                        "type": "string",
+                                        "pattern": "^\\d{2}/\\d{2}/\\d{4}$",
+                                        "example": "YYYY-MM-DD"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Cadastro criado com sucesso!<p><b>Pós-condição: </b></p>Cadastro de cliente salvo e persistido na base de dados. A API retornará um json de resposta contendo os dados desse novo cliente cadastrado em formato de objeto { id, cpf, nome, data_nasc, email }</p><p>O cadastro desse cliente na base de dados, torna-se habilitado a realizar avaliações de crédito no endpoint: <b>GET - Realizar uma avaliação de crédito, exibindo os cartões de crédito...</b> no microsserviço MSAVALIADOR.</p>",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "number",
+                                            "example": "0"
+                                        },
+                                        "cpf": {
+                                            "type": "string",
+                                            "example": "99999999999"
+                                        },
+                                        "nome": {
+                                            "type": "string",
+                                            "example": "user"
+                                        },
+                                        "data_nasc": {
+                                            "type": "string",
+                                            "format": "date",
+                                            "example": "YYYY-MM-DD"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "format": "email"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized | Token expirado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Acesso não autorizado/token expirado!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Error: Conflict | Atenção, não é possível cadastrar um email que já foi cadastrado!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Esse email já foi cadastrado!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error: Unprocessable Content | Erro de validação. Conteúdo JSON da requisição possui erros semânticos ou lógicos. Não é possível cadastrar email e CPF que já foram cadastrados!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "examples": {
+                                    "preencha_cpf": {
+                                        "summary": "Erro no cpf",
+                                        "value": {
+                                            "message": [
+                                                "O CPF precisa ter 11 dígitos numérico!",
+                                                "Esse CPF já foi cadastrado!"
+                                            ],
+                                            "errors": {
+                                                "cpf": [
+                                                    "O CPF precisa ter 11 dígitos numérico!",
+                                                    "Esse CPF já foi cadastrado!"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "preencha_nome": {
+                                        "summary": "Erro no nome",
+                                        "value": {
+                                            "message": [
+                                                "Informe o nome do cliente!"
+                                            ],
+                                            "errors": {
+                                                "nome": [
+                                                    "Informe o nome do cliente!"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "preencha_data_nasc": {
+                                        "summary": "Erro na data de nascimento",
+                                        "value": {
+                                            "message": [
+                                                "Informe a data de nascimento do cliente!",
+                                                "Formato inválido de data!",
+                                                "A data deve obedecer o formato YYYY-MM-DD"
+                                            ],
+                                            "errors": {
+                                                "data_nasc": [
+                                                    "Informe a data de nascimento do cliente!",
+                                                    "Formato inválido de data!",
+                                                    "A data deve obedecer o formato YYYY-MM-DD"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "preencha_email": {
+                                        "summary": "Erro no email",
+                                        "value": {
+                                            "message": [
+                                                "Informe o email do cliente!",
+                                                "Formato inválido de e-mail!",
+                                                "Esse email já foi cadastrado!"
+                                            ],
+                                            "errors": {
+                                                "email": [
+                                                    "Informe o email do cliente!",
+                                                    "Formato inválido de e-mail!",
+                                                    "Esse email já foi cadastrado!"
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal Server Error | Preenchimento vazio ou token de formato inválido!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de formato inválido!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Error: Service Unavailable | Serviços externos indisponíveis (clientes e cache)",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "examples": {
+                                    "servico_dados": {
+                                        "summary": "Erro Serviço Clientes",
+                                        "value": {
+                                            "status": "error_clients",
+                                            "message": "Serviço temporariamente indisponível. Tente novamente em instantes."
+                                        }
+                                    },
+                                    "servico_redis": {
+                                        "summary": "Erro Serviço Cache",
+                                        "value": {
+                                            "status": "error_cache",
+                                            "message": "Serviço de cache de tokens temporariamente indisponível! Tente novamente em instantes!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/msclientes/clientes/{id}": {
+            "get": {
+                "summary": "Retornar cliente pelo id ",
+                "description": "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><li><p><b>NOTA 1 <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></li><li><p><b>id: </b>informar id do cliente.</p></li><li><p><b>NOTA 2 <sup>id</sup>: </b>para preencher o id, o cliente precisa estar previamente cadastrado no microsserviço MSCLIENTES.</p></li></ul>",
+                "operationId": "a8ee05656be45796eed0a4918dda7d85",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Cliente encontrado com sucesso!<p><b>Pós-condição: </b></p>A API retornará um json de resposta contendo os dados desse cliente encontrado em formato de objeto { id, cpf, nome, data_nasc, email }</p>",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "number",
+                                            "example": "0"
+                                        },
+                                        "cpf": {
+                                            "type": "string",
+                                            "example": "99999999999"
+                                        },
+                                        "nome": {
+                                            "type": "string",
+                                            "example": "user"
+                                        },
+                                        "data_nasc": {
+                                            "type": "string",
+                                            "format": "date",
+                                            "example": "YYYY-MM-DD"
+                                        },
+                                        "email": {
+                                            "type": "email",
+                                            "example": "user@email.com"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error: Bad Request | Parâmetro id de cliente inválido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "O id do cliente precisa ser um número válido!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized | Token expirado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Acesso não autorizado/token expirado!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Error: Not Found | Cliente não encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "not_found"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cliente não encontrado!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal Server Error | Preenchimento vazio ou token de formato inválido!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de formato inválido!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Error: Service Unavailable | Serviços externos indisponíveis (clientes e cache)",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "examples": {
+                                    "servico_dados": {
+                                        "summary": "Erro Serviço Clientes",
+                                        "value": {
+                                            "status": "error_clients",
+                                            "message": "Serviço temporariamente indisponível. Tente novamente em instantes."
+                                        }
+                                    },
+                                    "servico_redis": {
+                                        "summary": "Erro Serviço Cache",
+                                        "value": {
+                                            "status": "error_cache",
+                                            "message": "Serviço de cache de tokens temporariamente indisponível! Tente novamente em instantes!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "summary": "Atualizar dados do cliente",
+                "description": "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><li><p><b>NOTA 1 <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></li><li><p><b>id: </b>informar id do cliente.</p></li><li><p><b>NOTA 2 <sup>id</sup>: </b>o id do cliente é de preenchimento obrigatório!</p></li><li><p><b>NOTA 3 <sup>id</sup>:</b> para preencher o id, o cliente precisa estar previamente cadastrado no microsserviço MSCLIENTES.</p></li></ul>",
+                "operationId": "25cb90afed166fe6689fc286a2e170b8",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "<p><b>Pré-condição:</b></p><ul><li><p>preenchimento/atualização opcional do atributo email no json da requisição (email).</p></li><li><p><b>NOTA 1 <sup>email</sup>: </b>o preenchimento do atributo email não é obrigatório. Mas, caso o email seja preenchido para ser alterado/atualizado, a API irá aplicar as regras de validação no email.</p></li><li><p><b>NOTA 2 <sup>email</sup>: </b>para atualizar o email, ele deve obedecer o seguinte formato de email: <b>user@email.com</b></p></li></ul>",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": ""
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Cadastro de cliente atualizado com sucesso!<p><b>Pós-condição</b></p>Será retornado um json de resposta contendo os dados do cliente no formato de objeto { id, cpf, nome, data_nasc, email }.</p><p><b>NOTA: </b>Havendo ou não o preenchimento do atributo email na Pré-condição, o json de retorno será retornado contendo os dados salvos na base de dados do microsserviço MSCLIENTES (como mostra o exemplo de resposta do json abaixo).</p>",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "number",
+                                                "example": "0"
+                                            },
+                                            "cpf": {
+                                                "type": "string",
+                                                "example": "99999999999"
+                                            },
+                                            "nome": {
+                                                "type": "string",
+                                                "example": "user"
+                                            },
+                                            "data_nasc": {
+                                                "type": "string",
+                                                "example": "YYYY-MM-DD"
+                                            },
+                                            "email": {
+                                                "type": "string",
+                                                "example": "user@email.com"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error: Bad Request | Parâmetro id de cliente inválido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "O id do cliente precisa ser um número válido!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized | Token expirado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Acesso não autorizado/token expirado!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Error: Not Found | Cliente não encontrado!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "not_found"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cliente não encontrado!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Error: Conflict | Não é possível atualizar um email de cliente que já foi cadastrado!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Esse email já foi cadastrado!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error: Unprocessable Content | Erro de validação. Conteúdo JSON da requisição possui erros semânticos ou lógicos!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "examples": {
+                                    "preencha_email": {
+                                        "summary": "Email inválido",
+                                        "value": {
+                                            "message": "Formato inválido de email!",
+                                            "errors": {
+                                                "email": [
+                                                    "Formato inválido de email!"
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal Server Error | Preenchimento vazio ou token de formato inválido!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de formato inválido!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Error: Service Unavailable | Serviços externos indisponíveis (clientes e cache)",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "examples": {
+                                    "servico_dados": {
+                                        "summary": "Erro Serviço Clientes",
+                                        "value": {
+                                            "status": "error_clients",
+                                            "message": "Serviço temporariamente indisponível. Tente novamente em instantes."
+                                        }
+                                    },
+                                    "servico_redis": {
+                                        "summary": "Erro Serviço Cache",
+                                        "value": {
+                                            "status": "error_cache",
+                                            "message": "Serviço de cache de tokens temporariamente indisponível! Tente novamente em instantes!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "summary": "Apagar cadastro do cliente e seus registros de cartões",
+                "description": "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><li><p><b>NOTA <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></li><li><p><b>id: </b>informar id do cliente.</p></li><li><p><b>NOTA 1 <sup>id</sup>:</b> para preencher o id, o cliente precisa estar previamente cadastrado no microsserviço MSCLIENTES.</p></li><li><p><b>NOTA 2 <sup>id</sup>: </b>se a busca do cliente for encontrado pelo seu id, o registro <u>NÃO</u> será removido permanentemente, contudo receberá o status de <i>disabled</i> (desativado).</p></li><li><p><b>NOTA 3: <sup>id</sup></b>conforme citado na NOTA 2, os cartões vinculados ao cliente também não serão removidos permanentemente da base de dados.</p></li><li><p><b>INFORMAÇÃO COMPLEMENTAR: </b>a condição de não excluir o registro permanentemente, existe para manter um histórico de cartões vinculados ao cliente, caso ele seja apagado. Essa condição também permite que o cliente apagado seja reativado novamente.</p></li></ul>",
+                "operationId": "68f929500618d2b3bd64d65bf785a1a5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Cliente removido com sucesso!<p><b>Pós-condição</b></p><p></p>Será desativado o registro do cliente juntamente com todos os cartões solicitados e vinculados a ele (o cliente), em ambas as bases de dados dos microsserviços MSCLIENTES e MSCARTOES.</p><p><b>NOTA: </b>A API não enxerga mais esse cliente nos endpoints de busca e avaliação de crédito.</p>",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cliente apagado com sucesso!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error: Bad Request | Parâmetro id de cliente inválido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "O id do cliente precisa ser um número válido!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized | Token expirado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Acesso não autorizado/token expirado!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Error: Not Found | Cliente não encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "not_found"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cliente não encontrado!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal Server Error | Preenchimento vazio ou token de formato inválido!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de formato inválido!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Error: Service Unavailable | Serviços externos indisponíveis (clientes e cache)",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "examples": {
+                                    "servico_dados": {
+                                        "summary": "Erro Serviço Clientes",
+                                        "value": {
+                                            "status": "error_clients",
+                                            "message": "Serviço temporariamente indisponível. Tente novamente em instantes."
+                                        }
+                                    },
+                                    "servico_redis": {
+                                        "summary": "Erro Serviço Cache",
+                                        "value": {
+                                            "status": "error_cache",
+                                            "message": "Serviço de cache de tokens temporariamente indisponível! Tente novamente em instantes!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/msclientes/clientes/search-recovery": {
+            "get": {
+                "summary": "Pesquisar por situação cadastral de cliente pelo seu CPF (cliente ativo/desativado)",
+                "description": "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><li><p><b>NOTA <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></li><li><p><b>cpf: </b>informar cpf do cliente.</p></li><li><p><b>NOTA 1 <sup>cpf</sup>:</b> para preencher o cpf, o cliente precisa estar previamente cadastrado no microsserviço MSCLIENTES.</p></li><li><p><b>NOTA 2 <sup>cpf</sup>: </b>digite apenas números no parâmetro do cpf (sem pontos, traços, hífen, letras ou caracteres especiais).</p></li></ul>",
+                "operationId": "a3c1732a9fde3d33b0dfdd40ad29f9f8",
+                "parameters": [
+                    {
+                        "name": "cpf",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Busca de cliente encontrado com sucesso!<p><b>Pós-condição</b></p><p>Retorna um json de resposta exibindo dados desse cliente.</p><ul><li><p><b>NOTA 1: </b>Junto com essa resposta, será exibida a situação cadastral desse cliente no atributo status: <i>enabled_client</i> para cliente ativado | <i>disabled_client</i> para cliente desativado.</p></li><br><li><p><b>NOTA 2: </b>Também será exibida a data em que esse cliente foi cadastrado no atributo <i>data_inicio</i> ou a data em que o cliente foi removido no atributo <i>data_fim .</i></p></li><br><li><p><b>NOTA 3: </b>Se o cliente nunca foi removido, ou foi reativado o seu registro, o atributo data_fim exibirá o valor <i>active .</i></p></li><br><li><p><b>INFORMAÇÃO COMPLEMENTAR: </b>Esse endpoint possui objetivo de verificar o status do cliente (ativo ou desativado). Dentro do json de resposta, será exibido o id desse cliente. Caso o objetivo seja reativar algum cliente que foi apagado, precisa informar o id retornado do cliente no endpoint: <b>POST - Reativar cadastro de cliente (cliente ativo)</b> no microsserviço MSCLIENTES.</p></li></ul>",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "status": {
+                                                "type": "string",
+                                                "example": [
+                                                    "enabled_client",
+                                                    "disabled_client"
+                                                ]
+                                            },
+                                            "client": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "number",
+                                                        "example": "0"
+                                                    },
+                                                    "cpf": {
+                                                        "type": "string",
+                                                        "example": "99999999999"
+                                                    },
+                                                    "nome": {
+                                                        "type": "string",
+                                                        "example": "user"
+                                                    },
+                                                    "email": {
+                                                        "type": "email",
+                                                        "example": "user@email.com"
+                                                    },
+                                                    "data_inicio": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "YYYY-MM-DD HH:MM:SS"
+                                                    },
+                                                    "data_fim": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": [
+                                                            "YYYY-MM-DD HH:MM:SS",
+                                                            "active"
+                                                        ]
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error: Bad Request | CPF do cliente inválido! O CPF precisa estar no formato numérico!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": [
+                                                "O CPF precisa ser informado!",
+                                                "O CPF precisa ser do formato numérico!"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized | Token expirado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Acesso não autorizado/token expirado!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Error: Not Found | Cliente não encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "not_found"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cliente não encontrado!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal Server Error | Preenchimento vazio ou token de formato inválido!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de formato inválido!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Error: Service Unavailable | Serviços externos indisponíveis (clientes e cache)",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "examples": {
+                                    "servico_dados": {
+                                        "summary": "Erro Serviço Clientes",
+                                        "value": {
+                                            "status": "error_clients",
+                                            "message": "Serviço temporariamente indisponível. Tente novamente em instantes."
+                                        }
+                                    },
+                                    "servico_redis": {
+                                        "summary": "Erro Serviço Cache",
+                                        "value": {
+                                            "status": "error_cache",
+                                            "message": "Serviço de cache de tokens temporariamente indisponível! Tente novamente em instantes!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/msclientes/clientes/recovery": {
+            "post": {
+                "summary": "Reativar cadastro de cliente (cliente ativo)",
+                "description": "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><li><p><b>NOTA <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></li></ul>",
+                "operationId": "aa48a663e004fc8af88f82a243af006c",
+                "requestBody": {
+                    "description": "<p><b>Pré-condição:</b></p><ul><li><p><b>id: </b>informar id do cliente no atributo id no corpo da requisição (dentro do json).</p></li><li><p><b>NOTA 1 <sup>id</sup>:</b> para preencher o id, o cliente precisa estar previamente cadastrado no microsserviço MSCLIENTES.</p></li><li><p><b>NOTA 2 <sup>id</sup>: </b>o id desse cliente que se deseja reativar o seu cadastro, poderá ser obtido pelo endpoint acima: <b>GET - Pesquisar por situação cadastral de cliente pelo seu CPF</b> no microsserviço MSCLIENTES.</p></li></ul>",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "id"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "number"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Cliente reativado com sucesso!<p><b>Pós-condição</b></p><p>Retorna um json de resposta exibindo dados desse cliente.</p><ul><li><p><b>NOTA 1: </b>Caso o cliente esteja desativado, será exibido no atributo <i>status</i>: <b>reactivated_client</b> e a mensagem no atributo <i>message</i>: <b>Cliente reativado .</b></p></li><br><li><p><b>NOTA 2: </b>Caso o cliente esteja ativado, será exibido no atributo <i>status</i>: <b>active_client</b> e a mensagem no atributo <i>message:</i><b>Cliente encontra-se ativo .</b></p></li><br><li><p><b>NOTA 3: </b>A cada remoção e reativação do cliente, o atributo <i>data_inicio</i> será atualizado sempre pelo último registro de reativação do cliente, ou seja, quando esse endpoint for executado.</p></li><br><li><p><b>INFORMAÇÃO COMPLEMENTAR: </b>Esse endpoint possui um único objetivo: reativar o cliente que foi removido pelo seu id. Uma vez que o cliente volta a estar ativo, ele voltará a ser exibido nos endpoints de pesquisas de clientes (microsserviço MSCLIENTES) e nas avaliações de crédito (microsserviço MSAVALIADOR).</p></li></ul>",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "status": {
+                                                "type": "string",
+                                                "example": [
+                                                    "reactivated_client",
+                                                    "active_client"
+                                                ]
+                                            },
+                                            "message": {
+                                                "type": "string",
+                                                "example": [
+                                                    "Cliente reativado",
+                                                    "Cliente encontra-se ativo"
+                                                ]
+                                            },
+                                            "client": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "number",
+                                                        "example": "0"
+                                                    },
+                                                    "cpf": {
+                                                        "type": "string",
+                                                        "example": "99999999999"
+                                                    },
+                                                    "nome": {
+                                                        "type": "string",
+                                                        "example": "user"
+                                                    },
+                                                    "email": {
+                                                        "type": "email",
+                                                        "example": "user@email.com"
+                                                    },
+                                                    "data_inicio": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "YYYY-MM-DD"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized | Token expirado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Acesso não autorizado/token expirado!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Error: Not Found | Cliente não encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "not_found"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cliente não encontrado!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error: Unprocessable Content | Erro de validação. Conteúdo JSON da requisição possui erros semânticos ou lógicos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "examples": {
+                                    "preencha_nome": {
+                                        "summary": "Erro no id",
+                                        "value": {
+                                            "message": [
+                                                "Informe o id do Cliente que se deseja reativar!",
+                                                "O id precisa ser do tipo numérico!"
+                                            ],
+                                            "errors": {
+                                                "id": [
+                                                    "Informe o id do Cliente que se deseja reativar!",
+                                                    "O id precisa ser do tipo numérico!"
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal Server Error | Preenchimento vazio ou token de formato inválido!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de formato inválido!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Error: Service Unavailable | Serviços externos indisponíveis (clientes e cache)",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "examples": {
+                                    "servico_dados": {
+                                        "summary": "Erro Serviço Clientes",
+                                        "value": {
+                                            "status": "error_clients",
+                                            "message": "Serviço temporariamente indisponível. Tente novamente em instantes."
+                                        }
+                                    },
+                                    "servico_redis": {
+                                        "summary": "Erro Serviço Cache",
+                                        "value": {
+                                            "status": "error_cache",
+                                            "message": "Serviço de cache de tokens temporariamente indisponível! Tente novamente em instantes!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/msclientes/cliente": {
+            "get": {
+                "summary": "Retornar cliente pelo seu CPF",
+                "description": "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><li><p><b>NOTA <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></li><li><p><b>cpf: </b>informar cpf do cliente.</p></li><li><p><b>NOTA 1 <sup>cpf</sup>:</b> para preencher o cpf, o cliente precisa estar previamente cadastrado no microsserviço MSCLIENTES.</p></li><li><p><b>NOTA 2 <sup>cpf</sup>: </b>digite apenas números no parâmetro do cpf (sem pontos, traços, hífen, letras ou caracteres especiais).</p></li><li><p><b>INFORMAÇÃO COMPLEMENTAR: </b>esse endpoint possui o objetivo de retornar os dados do cliente, quando o id do cliente é desconhecido. Também serve para utilizar nos endpoints que exigem que o id do cliente seja o único dado a ser enviado por parâmetro.</p></li></ul>",
+                "operationId": "ccc5cd1a9749825b49ca02c9e2d5aaea",
+                "parameters": [
+                    {
+                        "name": "cpf",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Cliente encontrado com sucesso!<p><b>Pós-condição</b></p><p>Retorna um json de resposta contendo os dados do cliente, dentre eles o <i>id</i> no formato objeto { id, cpf, nome, data_nasc, email } .</p>",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "number",
+                                            "example": "0"
+                                        },
+                                        "cpf": {
+                                            "type": "string",
+                                            "example": "99999999999"
+                                        },
+                                        "nome": {
+                                            "type": "string",
+                                            "example": "user"
+                                        },
+                                        "data_nasc": {
+                                            "type": "string",
+                                            "format": "date",
+                                            "example": "YYYY-MM-DD"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "format": "email"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error: Bad Request | CPF do cliente inválido! O CPF precisa estar no formato numérico!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": [
+                                                "O CPF precisa ser informado!",
+                                                "O CPF precisa ser do formato numérico!"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized | Token expirado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Acesso não autorizado/token expirado!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Error: Not Found | Cliente não encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "not_found"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cliente não encontrado!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal Server Error | Preenchimento vazio ou token de formato inválido!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de formato inválido!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Error: Service Unavailable | Serviços externos indisponíveis (clientes e cache)",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "examples": {
+                                    "servico_dados": {
+                                        "summary": "Erro Serviço Clientes",
+                                        "value": {
+                                            "status": "error_clients",
+                                            "message": "Serviço temporariamente indisponível. Tente novamente em instantes."
+                                        }
+                                    },
+                                    "servico_redis": {
+                                        "summary": "Erro Serviço Cache",
+                                        "value": {
+                                            "status": "error_cache",
+                                            "message": "Serviço de cache de tokens temporariamente indisponível! Tente novamente em instantes!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    }
+}

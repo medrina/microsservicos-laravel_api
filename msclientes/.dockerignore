@@ -1,0 +1,5 @@
+.env
+.git
+docker
+.dockerignore
+vendor

@@ -1,0 +1,1529 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API - MSAVALIADOR",
+        "description": "User Management API",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/",
+            "description": "Local Server"
+        }
+    ],
+    "paths": {
+        "/msavaliador/avaliacao-credito/{renda}": {
+            "get": {
+                "summary": "Realizar uma avaliação de crédito, exibindo os cartões de crédito calculado mediante a renda do cliente.",
+                "description": "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><li><p><b>NOTA 1 <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></li><li><p><b>renda: </b>a ser informada pelo cliente.</p></li><li><p><b>NOTA 2 <sup>renda</sup>: </b>preencha somente números (utilizando o ponto '.' como separador dos centavos) a renda mensal do cliente (EX.: preencher o valor: 1500.15 equivale a R$ 1.500,15).</p></li><li><p><b>cpf: </b>preencha o cpf do cliente.</p></li><li><p><b>NOTA 3 <sup>cpf</sup>: </b>para preencher o cpf, o cliente precisa estar previamente cadastrado no microsserviço MSCLIENTES.</p></li></ul>",
+                "operationId": "68a4231c03f323e0ab945a7b338f571d",
+                "parameters": [
+                    {
+                        "name": "renda",
+                        "in": "path",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "cpf",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Avaliação de crédito realizada com sucesso!<p><b>Pós-condição:</b></p><p>A resposta irá exibir um json contendo dados do cliente, a lista de cartões disponíveis de acordo com a renda do cliente, e com as faixas de renda dos cartões de crédito.</p><p>Dentre esses dados de resposta: <b>id do cliente, id do cartão, renda informada</b> do cliente e o <b>limite básico</b> (esses 4 dados devem ser preenchidos no endpoint: <b>POST - Solicitar um cartão de crédito</b> no microsserviço MSAVALIADOR).</p>",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "cliente": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 0
+                                                },
+                                                "cpf": {
+                                                    "type": "string",
+                                                    "example": "99999999999"
+                                                },
+                                                "nome": {
+                                                    "type": "string",
+                                                    "example": "user"
+                                                },
+                                                "data_nasc": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "YYYY-MM-DD"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "format": "email"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "cartoes": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 0
+                                                    },
+                                                    "nome": {
+                                                        "type": "string",
+                                                        "example": "nome_cartao"
+                                                    },
+                                                    "bandeira": {
+                                                        "type": "string",
+                                                        "example": "nome_bandeira"
+                                                    },
+                                                    "renda": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": "0000.00"
+                                                    },
+                                                    "limiteBasico": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "example": 0
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error: Bad Request | Parâmetros na requisição inválidos",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "examples": {
+                                    "preencha_cpf": {
+                                        "summary": "Erro no cpf",
+                                        "value": {
+                                            "status": "error",
+                                            "message": [
+                                                "O CPF precisa ser preenchido!",
+                                                "O CPF precisa estar no formato numérico!",
+                                                "O CPF precisa conter 11 dígitos!"
+                                            ]
+                                        }
+                                    },
+                                    "preencha_renda": {
+                                        "summary": "Erro na renda",
+                                        "value": {
+                                            "status": "error",
+                                            "message": "A renda precisa estar no formato numérico!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized | Token expirado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Acesso não autorizado/token expirado!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Error: Not Found | CPF não foi encontrado!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "not_found"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "CPF não encontrado!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error: Unprocessable Content | Erro de validação. Renda informada do cliente está abaixo do limite mínimo da faixa de valor dos cartões de crédito",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Saldo insuficiente! Não há cartões disponíveis para essa faixa de renda!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal Server Error | Preenchimento vazio ou token de formato inválido!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de formato inválido!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "502": {
+                        "description": "Error: Bad Gateway | Falha de conexão com serviço dos cartões!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error_cards"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Serviço de cartões temporariamente indisponível. Tente novamente em instantes!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Error: Service Unavailable | Serviços externos indisponíveis",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "examples": {
+                                    "servico_dados": {
+                                        "summary": "Erro Serviço Dados",
+                                        "value": {
+                                            "status": "error",
+                                            "message": "Serviço temporariamente indisponível. Tente novamente em instantes!"
+                                        }
+                                    },
+                                    "servico_redis": {
+                                        "summary": "Erro Serviço Cache",
+                                        "value": {
+                                            "status": "error_cache",
+                                            "message": "Serviço de cache de tokens temporariamente indisponível! Tente novamente em instantes!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/msavaliador/solicitar-cartao": {
+            "post": {
+                "summary": "Solicitar um cartão de crédito disponível conforme a sua renda, escolhido por um cliente cadastrado. O limite inicial, será estabelecido pelo limite básico",
+                "description": "<p><b>Pré-condição</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><li><p><b>NOTA <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></li></ul>",
+                "operationId": "cb048be0a1e8c0f2b38b21da1eb24b01",
+                "requestBody": {
+                    "description": "<p><b>Pré-condição:</b></p><ul><li><p>preencher o json no corpo da requisição com os 4 dados (id do cliente, id do cartão, renda do cliente e o limite básico) obtidos no endpoint: <b>GET - Realizar uma avaliação de crédito</b> no microsserviço MSAVALIADOR.</p></li><li><p><b>NOTA 1: </b>todos os dados dos atributos do json devem ser do tipo numéricos.</p></li><li><p><b>NOTA 2: </b>todos os dados dos atributos do json devem ser maiores que o valor 0 .</p></li></ul>",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "cliente_id",
+                                    "cartao_id",
+                                    "renda_cliente",
+                                    "limite_basico"
+                                ],
+                                "properties": {
+                                    "cliente_id": {
+                                        "type": "integer"
+                                    },
+                                    "cartao_id": {
+                                        "type": "integer"
+                                    },
+                                    "renda_cliente": {
+                                        "type": "number",
+                                        "format": "float"
+                                    },
+                                    "limite_basico": {
+                                        "type": "number",
+                                        "format": "float"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "202": {
+                        "description": "Solicitação de cartão enviada com sucesso!<p><b>Pós-condição:</b></p><p>Envia a solicitação ao microsserviço MSCARTOES, que recebendo, irá persistir na sua base de dados.</p><p><b>INFORMAÇÃO COMPLEMENTAR: </b>Caso o microsserviço MSCARTOES esteja ausente ou interrompido, a solicitação será enviada e armazenada temporariamente no broker da fila de mensageria. Quando o microsserviço MSCARTOES voltar/entrar em execução, a solicitação será processada e persistida na sua base de dados.</p>",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Sua solicitação de cartão passará por uma breve análise!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized | Token expirado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Acesso não autorizado/token expirado!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error: Unprocessable Content | Erro de validação. Conteúdo JSON da requisição possui erros semânticos ou lógicos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "examples": {
+                                    "preencha_cliente_id": {
+                                        "summary": "Erro no id do cliente",
+                                        "value": {
+                                            "message": [
+                                                "Preencha o id do cliente!",
+                                                "O id do cliente precisa ser do tipo numérico!",
+                                                "O id do cliente não pode ser igual a zero!"
+                                            ],
+                                            "errors": {
+                                                "cliente_id": [
+                                                    "Preencha o id do cliente!",
+                                                    "O id do cliente precisa ser do tipo numérico!",
+                                                    "O id do cliente não pode ser igual a zero!"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "preencha_cartao_id": {
+                                        "summary": "Erro no id do cartão",
+                                        "value": {
+                                            "message": [
+                                                "Preencha o id do cartão!",
+                                                "O id do cartão precisa ser do tipo numérico!",
+                                                "O id do cartão não pode ser igual a zero!"
+                                            ],
+                                            "errors": {
+                                                "cartao_id": [
+                                                    "Preencha o id do cartão!",
+                                                    "O id do cartão precisa ser do tipo numérico!",
+                                                    "O id do cartão não pode ser igual a zero!"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "preencha_renda_cliente": {
+                                        "summary": "Erro na renda do cliente",
+                                        "value": {
+                                            "message": [
+                                                "Preencha a renda do cliente!",
+                                                "A renda do cliente precisa ser um valor numérico!",
+                                                "A renda do cliente não pode ser igual a zero!"
+                                            ],
+                                            "errors": {
+                                                "renda_cliente": [
+                                                    "Preencha a renda do cliente!",
+                                                    "A renda do cliente precisa ser um valor numérico!",
+                                                    "A renda do cliente não pode ser igual a zero!"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "preencha_limite_basico": {
+                                        "summary": "Erro no limite básico do cliente",
+                                        "value": {
+                                            "message": [
+                                                "Preencha o limite básico do cliente!",
+                                                "O limite básico precisa ser um valor numérico!",
+                                                "O limite básico do cliente não pode ser igual a zero!"
+                                            ],
+                                            "errors": {
+                                                "limite_basico": [
+                                                    "Preencha o limite básico do cliente!",
+                                                    "O limite básico precisa ser um valor numérico!",
+                                                    "O limite básico do cliente não pode ser igual a zero!"
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal Server Error | Preenchimento vazio ou token de formato inválido!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de formato inválido!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Error: Service Unavailable | Serviços externos indisponíveis",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "examples": {
+                                    "servico_redis": {
+                                        "summary": "Erro Serviço Cache",
+                                        "value": {
+                                            "status": "error_cache",
+                                            "message": "Serviço de cache de tokens temporariamente indisponível! Tente novamente em instantes!"
+                                        }
+                                    },
+                                    "servico_rabbitmq": {
+                                        "summary": "Erro Solicitação Cartão",
+                                        "value": {
+                                            "status": "error_solicit_cards",
+                                            "message": "Serviço de solicitação de cartão temporariamente indisponível! Tente novamente em instantes!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/msavaliador/cliente-cartao/{id_cliente}": {
+            "get": {
+                "summary": "Buscar lista de cartões de crédito registrados junto ao cliente, através do id do cliente ",
+                "description": "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><li><p><b>NOTA 1<sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></li><li><p><b>id_cliente: </b>informar id do cliente.</p></li><li><p><b>NOTA 2 <sup>id</sup>: </b>para preencher o id, o cliente precisa estar previamente cadastrado no microsserviço MSCLIENTES.</p></li></ul>",
+                "operationId": "5039482d98f7e959169affc993bee870",
+                "parameters": [
+                    {
+                        "name": "id_cliente",
+                        "in": "path",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Exibe todos os cartões que foram solicitados pelo cliente<p><b>Pós-condição:</b></p><p>Retorna um json contendo os dados do cliente, e a lista de cartões registrados desse cliente dentro de um array.<p><b>INFORMAÇÃO COMPLEMENTAR: </b>Dentro da resposta do json de cada cartão, serão exibidos o nome do cartão, nome da bandeira, e 3 informações discriminadas importantes de valores que seguem abaixo:</p></p><ul><li><b>renda-cartao: </b>exibe o valor da faixa de renda do cartão de crédito.</li><li><b>renda-cliente: </b>exibe o valor da renda mensal informada pelo cliente.</li><li><b>limite-basico: </b>exibe o valor do limite inicial do cartão concedido a esse cliente.</li></ul>",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "cliente": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 0
+                                                },
+                                                "cpf": {
+                                                    "type": "string",
+                                                    "example": "99999999999"
+                                                },
+                                                "nome": {
+                                                    "type": "string",
+                                                    "example": "user"
+                                                },
+                                                "data_nasc": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "YYYY-MM-DD"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "format": "email"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "cartoes": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 0
+                                                    },
+                                                    "nome": {
+                                                        "type": "string",
+                                                        "example": "nome_cartao"
+                                                    },
+                                                    "bandeira": {
+                                                        "type": "string",
+                                                        "example": "nome_bandeira"
+                                                    },
+                                                    "renda-cartao": {
+                                                        "type": "number",
+                                                        "example": "0000.00"
+                                                    },
+                                                    "renda-cliente": {
+                                                        "type": "number",
+                                                        "example": "0000.00"
+                                                    },
+                                                    "limite-basico": {
+                                                        "type": "number",
+                                                        "example": "0000.00"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error: Bad Request | Parâmetro id na requisição inválido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "O id do cliente precisa ser um número válido!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized | Token expirado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Acesso não autorizado/token expirado!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Error: Not Found | Cliente não encontrado!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "not_found"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cliente não encontrado!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal Server Error | Preenchimento vazio ou token de formato inválido!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de formato inválido!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Error: Service Unavailable | Serviços externos indisponíveis",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "examples": {
+                                    "servico_dados": {
+                                        "summary": "Erro Serviços Clientes-Cartões",
+                                        "value": {
+                                            "status": "error_client_cards",
+                                            "message": "Serviço temporariamente indisponível. Tente novamente em instantes!"
+                                        }
+                                    },
+                                    "servico_redis": {
+                                        "summary": "Erro Serviço Cache",
+                                        "value": {
+                                            "status": "error_cache",
+                                            "message": "Serviço de cache de tokens temporariamente indisponível! Tente novamente em instantes!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/msavaliador/user/register": {
+            "post": {
+                "summary": "Cadastra um novo usuário Administrador. Esse cadastro possibilita a esse usuário realizar login, para se autenticar na API",
+                "operationId": "75b45082503484c5841a9009235f20b1",
+                "requestBody": {
+                    "description": "<p><b>Pré-condição:</b></p><ul><li><p>preencher o json no corpo da requisição no formato de objeto { name, email, password } .</p></li><li><p><b>NOTA 1 <sup>email</sup>: </b>não é possível cadastrar um email já existente para um novo usuário Administrador.</p></li><li><p><b>NOTA 2 <sup>email</sup>: </b>o email deve obedecer o seguinte formato de email: <b>user@email.com .</b></p></li><li><p><b>NOTA 3 <sup>password</sup>: </b>o password deve ter no mínimo 5 caracteres.</p></li></ul>",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "user"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": ""
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Cadastro de usuário Administrador criado com sucesso!<p><b>Pós-condição:</b></p><p>Nome e email de usuário administrador cadastrados e persistidos na base de dados do microsserviço MSAVALIADOR.</p><p>Usuário Administrador está habilitado a executar o endpoint de login: <b>POST - Efetuar login de usuário Administrador... </b> no microsserviço MSAVALIADOR.</p>",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Cadastro criado com sucesso!"
+                                        },
+                                        "user": {
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "user"
+                                                },
+                                                "email": {
+                                                    "type": "email",
+                                                    "example": "user@email.com"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Error: Conflict | Não é possível cadastrar um email que já foi cadastrado!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Esse email já foi cadastrado!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error: Unprocessable Content | Erro de validação. Conteúdo JSON da requisição possui erros semânticos ou lógicos!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "examples": {
+                                    "preencha_nome": {
+                                        "summary": "Erro no nome",
+                                        "value": {
+                                            "message": [
+                                                "Cadastre nome de usuário!"
+                                            ],
+                                            "errors": {
+                                                "nome": [
+                                                    "Cadastre nome de usuário!"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "email_invalido": {
+                                        "summary": "Erro no e-mail",
+                                        "value": {
+                                            "message": [
+                                                "Cadastre email para esse usuário!",
+                                                "Formato de email inválido!"
+                                            ],
+                                            "errors": {
+                                                "email": [
+                                                    "Cadastre email para esse usuário!",
+                                                    "Formato de email inválido!"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "senha_em_branco": {
+                                        "summary": "Erro na senha",
+                                        "value": {
+                                            "message": [
+                                                "Cadastre uma senha de usuário!",
+                                                "A senha precisa ter 5 caracteres!"
+                                            ],
+                                            "errors": {
+                                                "password": [
+                                                    "Cadastre uma senha de usuário!",
+                                                    "A senha precisa ter 5 caracteres!"
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Error: Service Unavailable | Serviço de criar usuário Administrador indisponível!",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "examples": {
+                                    "servico_dados": {
+                                        "summary": "Erro Serviço Usuários",
+                                        "value": {
+                                            "status": "error_users",
+                                            "message": "Serviço de usuário temporariamente indisponível. Tente novamente em instantes!"
+                                        }
+                                    },
+                                    "servico_redis": {
+                                        "summary": "Erro Serviço Cache",
+                                        "value": {
+                                            "status": "error_cache",
+                                            "message": "Serviço de cache de tokens temporariamente indisponível! Tente novamente em instantes!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/msavaliador/user/login": {
+            "post": {
+                "summary": "Efetuar login de usuário Administrador (obtém token válido de duração de 1h)",
+                "operationId": "0fbf8db240d10de94279edc38f02e31a",
+                "requestBody": {
+                    "description": "<p><b>Pré-condição:</b></p><ul><li><p>usuário administrador precisa ter executado o endpoint de cadastro de usuário administrador: <b>POST - Cadastra um novo usuário Administrador...</b> no microsserviço MSAVALIADOR.</p></li><li><p><b>NOTA: </b>informar email e senha de usuário administrador que já esteja cadastrado no microsserviço MSAVALIADOR.</p></li></ul>",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": ""
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "<p>Login efetuado com sucesso!</p><p><b>Pós-condição:</b></p><p>A resposta irá retornar o id do usuário autorizado, e irá gerar um token de usuário autenticado, para poder acessar os endpoints protegidos dos 3 microsserviços (MSAVALIADOR, MSCLIENTES e MSCARTOES).</p><p><b>NOTA <sup>expires_in</sup>: </b>O tempo do token irá vir discriminado no atributo <i>expires_in</i>. Duração do token de acesso: 3600s equivale a 1h.</p>",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "id": {
+                                            "type": "number",
+                                            "example": "0"
+                                        },
+                                        "token": {
+                                            "type": "string",
+                                            "example": "token_de_acesso"
+                                        },
+                                        "expires_in": {
+                                            "type": "number",
+                                            "example": "3600"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized | Email ou senha são inválidas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Credenciais inválidas"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error: Unprocessable Content | Erro de validação. Conteúdo JSON da requisição possui erros semânticos ou lógicos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "examples": {
+                                    "email_invalido": {
+                                        "summary": "Erro no e-mail",
+                                        "value": {
+                                            "message": [
+                                                "Formato de email inválido!",
+                                                "Preencha o email!"
+                                            ],
+                                            "errors": {
+                                                "email": [
+                                                    "Formato de email inválido!",
+                                                    "Preencha o email!"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "senha_em_branco": {
+                                        "summary": "Erro na senha",
+                                        "value": {
+                                            "message": "Preencha a senha!",
+                                            "errors": {
+                                                "password": [
+                                                    "Preencha a senha!"
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Error: Service Unavailable | Serviço de verificação de senhas indisponível!",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "examples": {
+                                    "servico_dados": {
+                                        "summary": "Erro Serviço Usuários",
+                                        "value": {
+                                            "status": "error_users",
+                                            "message": "Serviço de usuário temporariamente indisponível. Tente novamente em instantes!"
+                                        }
+                                    },
+                                    "servico_redis": {
+                                        "summary": "Erro Serviço Cache",
+                                        "value": {
+                                            "status": "error_cache",
+                                            "message": "Serviço de cache de tokens temporariamente indisponível! Tente novamente em instantes!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/msavaliador/user/update/{id}": {
+            "patch": {
+                "summary": "Atualizar dados (parciais) de usuário Administrador",
+                "description": "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><li><p><b>NOTA <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></li><li><p><b>id: </b>preenchimento do id do usuário administrador.</p></li><li><p><b>NOTA 1 <sup>id</sup>: </b>o id do usuário administrador é obrigatório o seu preenchimento.</p></li><li><p><b>NOTA 2 <sup>id</sup>: </b>para preencher o id, o usuário administrador precisa estar previamente cadastrado no microsserviço MSAVALIADOR.</p></li></ul>",
+                "operationId": "09b3613d30cb0dc214fee8c198ea37e1",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "<p><b>Pré-condição:</b></p><ul><li><p>preenchimento de forma parcial do json no corpo da requisição no formato objeto { name, email, password } .</p></li><li><p><b>NOTA 1: </b>o preenchimento dos atributos do json não são obrigatórios. Entretanto, se forem preenchidos para serem alterados/atualizados, a API irá aplicar as regras de validação em cada atributo.</p></li><li><p><b>NOTA 2 <sup>email</sup>: </b>para atualizar o email, ele deve obedecer o seguinte formato de email: <b>user@email.com .</b></p></li><li><p><b>NOTA 3 <sup>password</sup>: </b>se o password for preenchido, ele será persistido na base de dados, porém, o novo password <u>NÃO</u> será retornado no json de resposta.</p></li><li><p><b>NOTA 4 <sup>password</sup>: </b>o novo password deve conter no mínimo 5 caracteres.</p></li></ul>",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": ""
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": ""
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": ""
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Dados atualizados com sucesso<p><b>Pós-condição</b></p><p>Será retornado um json de resposta contendo os dados do usuário Administrador (exceto o password do usuário).</p><p><b>NOTA: </b>Havendo ou não o preenchimento dos atributos na Pré-condição, o json de retorno será retornado contendo os dados salvos na base de dados do microsserviço MSAVALIADOR (como mostra o exemplo de retorno do json abaixo).</p>",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "number",
+                                                    "example": "0"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "user"
+                                                },
+                                                "email": {
+                                                    "type": "email",
+                                                    "example": "user@email.com"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Error: Bad Request | Parâmetro id do usuário inválido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "O id do usuário precisa ser um número válido!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized | Token expirado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Acesso não autorizado/token expirado!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Error: Not Found | Usuário Administrador não encontrado!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "not_found"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Usuário não encontrado!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Error: Conflict | Não é possível atualizar um email que já foi cadastrado!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Esse email já foi cadastrado!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error: Unprocessable Content | Erro de validação. Conteúdo JSON da requisição possui erros semânticos ou lógicos!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "examples": {
+                                    "email_invalido": {
+                                        "summary": "Erro no e-mail",
+                                        "value": {
+                                            "message": [
+                                                "Formato de email inválido!"
+                                            ],
+                                            "errors": {
+                                                "email": [
+                                                    "Formato de email inválido!"
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal Server Error | Preenchimento vazio ou token de formato inválido!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de formato inválido!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Error: Service Unavailable | Serviços externos indisponíveis (atualizar usuários e cache)",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "examples": {
+                                    "servico_dados": {
+                                        "summary": "Erro Serviço Usuários",
+                                        "value": {
+                                            "status": "error_users",
+                                            "message": "Serviço de usuário temporariamente indisponível. Tente novamente em instantes!"
+                                        }
+                                    },
+                                    "servico_redis": {
+                                        "summary": "Erro Serviço Cache",
+                                        "value": {
+                                            "status": "error_cache",
+                                            "message": "Serviço de cache de tokens temporariamente indisponível! Tente novamente em instantes!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/msavaliador/user/reset-password": {
+            "post": {
+                "summary": "Gerar nova senha aleatória de usuário Administrador",
+                "operationId": "d63b9d2752af81ba531397cd1368a133",
+                "requestBody": {
+                    "description": "<p><b>Pré-condição:</b></p><ul><li><p>preencher o json no corpo da requisição no formato de objeto { name, email } .</p></li><li><p><b>NOTA 1<sup>name</sup>: </b>o name do usuário Administrador, deve estar previamente cadastrado na base de dados do microsserviço MSAVALIADOR.</p></li><li><p><b>NOTA 2<sup>email</sup>: </b>o email do usuário Administrador, deve estar previamente cadastrado na base de dados do microsserviço MSAVALIADOR.</p></li><li><p><b>NOTA 3 <sup>email</sup>: </b>para o preenchimento do email, ele deve obedecer o seguinte formato de email: <b>user@email.com</b> .</p></li></ul>",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "user"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@email.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Nova senha gerada com sucesso!<p><b>Pós-condição:</b></p><p>Será retornado um json de resposta contendo name, email e uma nova senha/password gerado aleatoriamente pela API.</p><p><b>INFORMAÇÃO COMPLEMENTAR: </b>Com esse novo password gerado aleatoriamente pela API, o usuário Administrador pode:</p><p><b>1) </b> realizar login informando o seu email e a nova senha gerada aleatoriamente, acessando o endpoint: <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR, obtendo o id do seu usuário Administrador, e também o token de acesso,</p><p><b>2) </b>atualizar dados de usuário Administrador informando o seu id e o token de acesso no endpoint: <b>PATCH - Atualizar dados (parciais) de usuário Administrador</b> no microsserviço MSAVALIADOR, e atualizar um novo password de sua preferência.</p>",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "user"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "format": "email"
+                                        },
+                                        "password": {
+                                            "type": "string",
+                                            "example": "senha_gerada_aleatória"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Error: Not Found | Usuário Administrador não encontrado!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "not_found"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Usuário não encontrado!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error: Unprocessable Content | Erro de validação. Conteúdo JSON da requisição possui erros semânticos ou lógicos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "examples": {
+                                    "name_invalido": {
+                                        "summary": "Erro no nome",
+                                        "value": {
+                                            "message": [
+                                                "Preencha o nome!"
+                                            ],
+                                            "errors": {
+                                                "email": [
+                                                    "Preencha o nome!"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "email_invalido": {
+                                        "summary": "Erro no e-mail",
+                                        "value": {
+                                            "message": [
+                                                "Preencha o email!",
+                                                "Formato de email inválido!"
+                                            ],
+                                            "errors": {
+                                                "email": [
+                                                    "Preencha o email!",
+                                                    "Formato de email inválido!"
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Error: Service Unavailable | Serviço de resetar senhas indisponível!",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "examples": {
+                                    "servico_dados": {
+                                        "summary": "Erro Serviço Usuários",
+                                        "value": {
+                                            "status": "error_users",
+                                            "message": "Serviço de usuário temporariamente indisponível. Tente novamente em instantes!"
+                                        }
+                                    },
+                                    "servico_redis": {
+                                        "summary": "Erro Serviço Cache",
+                                        "value": {
+                                            "status": "error_cache",
+                                            "message": "Serviço de cache de tokens temporariamente indisponível! Tente novamente em instantes!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/msavaliador/user/logout": {
+            "post": {
+                "summary": "Deslogar usuário Administrador. Realizar logout da API (invalidar token de acesso)",
+                "description": "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário Administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><li><p><b>NOTA <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></li><li><p><b>INFORMAÇÃO COMPLEMENTAR: </b>esse endpoint não exige parâmetros!</p></li></ul>",
+                "operationId": "b4b50064009fb8f59898757e0b685bab",
+                "responses": {
+                    "200": {
+                        "description": "Logout efetuado com sucesso!<p><b>Pós-condição: </b></p><p>Invalida token de acesso, impedindo desse usuário administrador acessar os endpoints protegidos de todos os microsserviços.</p>",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logout realizado com sucesso!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Error: Unauthorized | Token expirado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Acesso não autorizado/token expirado!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error: Internal Server Error | Preenchimento vazio ou token de formato inválido!",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token de formato inválido!!!"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "Error: Service Unavailable | Serviços externos indisponíveis (serviço de autenticação e cache)",
+                        "content": {
+                            "application/json": {
+                                "schema": {},
+                                "examples": {
+                                    "servico_dados": {
+                                        "summary": "Erro Serviço Usuários",
+                                        "value": {
+                                            "status": "error",
+                                            "message": "Serviço temporariamente indisponível. Tente novamente em instantes."
+                                        }
+                                    },
+                                    "servico_redis": {
+                                        "summary": "Erro Serviço Cache",
+                                        "value": {
+                                            "status": "error_cache",
+                                            "message": "Serviço de cache de tokens temporariamente indisponível! Tente novamente em instantes!"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    }
+}

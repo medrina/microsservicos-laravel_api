@@ -14,7 +14,7 @@ class SolicitarCartaoJob implements ShouldQueue {
         //
     }
 
-    // recebe os dados do msavaliadorcredito via fila de mensageria pelo RabbitMQ
+    // recebe os dados do microsserviço msavaliador via fila de mensageria pelo RabbitMQ através do endpoint: POST  /msavaliador/solicitar-cartao
     public function handle(): void {
         
         // cria uma nova solicitação de cartão de crédito na tabela cliente_cartao
@@ -27,7 +27,7 @@ class SolicitarCartaoJob implements ShouldQueue {
             ]);
         }
         catch(PDOException $e) {
-            echo 'error: Não foi possível realizar o cadastro dessa solicitação!\nmessage: '. $e->getMessage();
+            echo 'error: Não foi possível realizar a solicitação desse cartão de crédito!';
         }
     }
 }

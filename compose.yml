@@ -1,0 +1,194 @@
+# MICROSSERVIÇO MSCLIENTES
+services:
+  msclientes:
+    environment:
+      - COMPOSER_PROCESS_TIMEOUT=0
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+      args:
+        - SUPERVISOR_FILE=laravel-worker-clientes.conf
+        - MICROSERVICE=msclientes
+    container_name: msclientes
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./msclientes:/var/www
+    depends_on:
+      db_msclientes:
+        condition: service_healthy
+    networks:
+      - laravel_mysql
+#--------------------------------------------------------------------------------
+# MICROSSERVIÇO MSCARTOES
+  mscartoes:
+    environment:
+      - COMPOSER_PROCESS_TIMEOUT=0
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+      args:
+        - SUPERVISOR_FILE=laravel-worker-cartoes.conf
+        - MICROSERVICE=mscartoes
+    container_name: mscartoes
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./mscartoes:/var/www
+    depends_on:
+      db_mscartoes:
+        condition: service_healthy
+    networks:
+      - laravel_mysql
+#--------------------------------------------------------------------------------
+# MICROSSERVIÇO MSAVALIADOR
+  msavaliador:
+    environment:
+      - COMPOSER_PROCESS_TIMEOUT=0
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+      args:
+        - SUPERVISOR_FILE=laravel-worker-avaliador.conf
+        - MICROSERVICE=msavaliador
+    container_name: msavaliador
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./msavaliador:/var/www
+    depends_on:
+      db_msavaliador:
+        condition: service_healthy
+    networks:
+      - laravel_mysql
+#--------------------------------------------------------------------------------
+# SERVIDOR WEB NGINX
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./msclientes:/var/www/msclientes
+      - ./mscartoes:/var/www/mscartoes
+      - ./msavaliador:/var/www/msavaliador
+    depends_on:
+      - msclientes
+      - mscartoes
+      - msavaliador
+    networks:
+      - laravel_mysql
+#--------------------------------------------------------------------------------
+# SERVIÇO DE MENSAGERIA
+  rabbitmq:
+    image: rabbitmq:4.3.1-management-alpine
+    container_name: rabbitmq
+    ports: 
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - mariadb_rabbitmq_data:/var/lib/rabbitmq
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./rabbitmq/definitions.json:/etc/rabbitmq/definitions.json
+      - ./rabbitmq/rabbitmq.config:/etc/rabbitmq/rabbitmq.config
+    networks:
+      - laravel_mysql
+#--------------------------------------------------------------------------------
+# SERVIÇO DE CACHE DE TOKENS JWT INVÁLIDOS EM MEMÓRIA
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:  
+      - laravel_mysql
+#--------------------------------------------------------------------------------
+# BANCO DE DADOS DO MICROSSERVIÇO MSCLIENTES
+  db_msclientes:
+    image: mariadb:12.3
+    container_name: db_msclientes
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: msclientes
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_PASSWORD: root
+      MARIADB_USER: msclientes
+    command: ["--innodb-use-native-aio=1"]
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_msclientes:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -u root -proot || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - laravel_mysql
+#--------------------------------------------------------------------------------
+# BANCO DE DADOS DO MICROSSERVIÇO MSCARTOES
+  db_mscartoes:
+    image: mariadb:12.3
+    container_name: db_mscartoes
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: mscartoes
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_PASSWORD: root
+      MARIADB_USER: mscartoes
+    command: ["--innodb-use-native-aio=1"]
+    ports:
+      - "3307:3306"
+    volumes:
+      - mariadb_mscartoes:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -u root -proot || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - laravel_mysql
+#--------------------------------------------------------------------------------
+# BANCO DE DADOS DO MICROSSERVIÇO MSAVALIADOR
+  db_msavaliador:
+    image: mariadb:12.3
+    container_name: db_msavaliador
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: msavaliador
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_PASSWORD: root
+      MARIADB_USER: msavaliador
+    command: ["--innodb-use-native-aio=1"]
+    ports:
+      - "3308:3306"
+    volumes:
+      - mariadb_msavaliador:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -u root -proot || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - laravel_mysql
+#--------------------------------------------------------------------------------
+# REDE INTERNA DOS CONTAINERS 
+networks:
+  laravel_mysql:
+    name: api_laravel
+    driver: bridge
+#--------------------------------------------------------------------------------
+# VOLUMES DE DADOS DOS CONTAINERS
+volumes:
+  mariadb_mscartoes:
+  mariadb_msclientes:
+  mariadb_msavaliador:
+  mariadb_rabbitmq_data:
