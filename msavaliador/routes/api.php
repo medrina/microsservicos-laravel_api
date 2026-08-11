@@ -4,11 +4,6 @@ use App\Http\Controllers\AvaliadorController;
 use App\Http\Controllers\LoginController;
 use Illuminate\Support\Facades\Route;
 
-# Windows
-Route::prefix('msavaliador')->get('/user/msavaliador', function() {
-    return 'msavaliador';
-});
-
 // criar novo usuário Adm para operar no MSAVALIADORCREDITO
 Route::post('/user/register', [LoginController::class, 'register'])->prefix('msavaliador');
 

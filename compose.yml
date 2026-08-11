@@ -118,7 +118,6 @@ services:
       MARIADB_ROOT_PASSWORD: root
       MARIADB_PASSWORD: root
       MARIADB_USER: msclientes
-    command: ["--innodb-use-native-aio=1"]
     ports:
       - "3306:3306"
     volumes:
@@ -142,7 +141,6 @@ services:
       MARIADB_ROOT_PASSWORD: root
       MARIADB_PASSWORD: root
       MARIADB_USER: mscartoes
-    command: ["--innodb-use-native-aio=1"]
     ports:
       - "3307:3306"
     volumes:
@@ -166,7 +164,6 @@ services:
       MARIADB_ROOT_PASSWORD: root
       MARIADB_PASSWORD: root
       MARIADB_USER: msavaliador
-    command: ["--innodb-use-native-aio=1"]
     ports:
       - "3308:3306"
     volumes:
