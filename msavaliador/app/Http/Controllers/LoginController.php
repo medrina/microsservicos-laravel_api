@@ -111,14 +111,6 @@ class LoginController extends Controller {
      *                     "status": "error_users",
      *                     "message": "Serviço de usuário temporariamente indisponível. Tente novamente em instantes!"
      *                  }
-     *               ),
-     *               @OA\Examples(
-     *                  example="servico_redis",
-     *                  summary="Erro Serviço Cache",
-     *                  value={
-     *                     "status": "error_cache",
-     *                     "message": "Serviço de cache de tokens temporariamente indisponível! Tente novamente em instantes!"
-     *                  }
      *               )
      *            }
      *       )
@@ -227,14 +219,6 @@ class LoginController extends Controller {
      *                  value={
      *                     "status": "error_users",
      *                     "message": "Serviço de usuário temporariamente indisponível. Tente novamente em instantes!"
-     *                  }
-     *               ),
-     *               @OA\Examples(
-     *                  example="servico_redis",
-     *                  summary="Erro Serviço Cache",
-     *                  value={
-     *                     "status": "error_cache",
-     *                     "message": "Serviço de cache de tokens temporariamente indisponível! Tente novamente em instantes!"
      *                  }
      *               )
      *            }
