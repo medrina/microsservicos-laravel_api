@@ -171,6 +171,7 @@ class LoginController extends Controller {
      *       @OA\JsonContent(
      *          type="object",
      *          @OA\Property(property="status", type="string", example="success"),
+     *          @OA\Property(property="message", type="string", example="Login realizado com sucesso!"),
      *          @OA\Property(property="id", type="number", example="0"),
      *          @OA\Property(property="token", type="string", example="token_de_acesso"),
      *          @OA\Property(property="expires_in", type="number", example="3600")
@@ -259,6 +260,7 @@ class LoginController extends Controller {
         }
         return response()->json([
             'status' => 'success',
+            'message' => 'Login realizado com sucesso!',
             'id' => Auth::user()->getAttributes()['id'],
             'token' => $token,
             'expires_in' => auth('api')->factory()->getTTL() * 60
