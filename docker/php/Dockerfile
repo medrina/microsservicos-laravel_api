@@ -40,6 +40,10 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Diretório da aplicação
 WORKDIR /var/www
 
+# oculta a versão do PHP do cabeçalho de resposta da requisição HTTP
+COPY docker/php/custom-php.ini /usr/local/etc/php/conf.d/custom-php.ini
+RUN chmod +x /usr/local/etc/php/conf.d/custom-php.ini
+
 # copia o script responsável que vai executar alguns comandos no terminal de cada container de cada microsserviço
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
