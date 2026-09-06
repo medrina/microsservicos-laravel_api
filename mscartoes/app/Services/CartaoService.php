@@ -107,8 +107,9 @@ class CartaoService {
         return $array;
     }
 
+    // resgata histórico de todos os cartões que foram solicitados pelo cliente 
     public function getClienteCartoes(int $id) {
-        $listaClienteCartoes = ClienteCartao::where('id_cliente', $id)->get();
+        $listaClienteCartoes = ClienteCartao::where('id_cliente', $id)->withTrashed()->get();
         if(!$listaClienteCartoes) return null;
         else return $listaClienteCartoes;
     }
