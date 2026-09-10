@@ -31,7 +31,7 @@ Concluindo, a API requer os seguintes pré-requisitos abaixo:
 <b>NOTA<sup>Docker</sup>: </b>Caso você não tenha o Docker instalado no seu Sistema Operacional Linux, o passo-a-passo da <b>Instalação</b>, lhe explicará de como instalar.
 ## Instalação
 1) no seu sistema operacional Linux, abrir o terminal<br>
-2) no terminal, acessar o diretório do seu usuário: <b>`cd /home/$USER/`</b><br>
+2) no terminal, acessar o diretório do seu usuário: <b>`cd /home/$USER/`</b>
 <b>NOTA: </b> Se você tiver o Docker já instalado no seu sistema operacional Linux, desconsidere as etapas 3 e 4, e avançe à etapa 5. Mas se você não tiver o Docker instalado no seu computador, prossiga na etapa 3 e 4.<br>
 3) baixar o script de configuração do repositório oficial do Docker digitando: <b>`wget https://get.docker.com -O docker-linux.sh`</b><br>
 4) instalar a versão oficial do Docker no Linux. Aguardar as operações e liberação do terminal, digite: <b>`sudo sh docker-linux.sh`</b><br>
