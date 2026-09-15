@@ -25,7 +25,7 @@ class AvaliadorController extends Controller {
      *      path="/msavaliador/avaliacao-credito/{renda}",
      *      summary="Realizar uma avaliação de crédito, exibindo os cartões de crédito calculado mediante a renda do cliente.",
      *      description=
-     *         "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><li><p><b>NOTA 1 <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></li><li><p><b>renda: </b>a ser informada pelo cliente.</p></li><li><p><b>NOTA 2 <sup>renda</sup>: </b>preencha somente números (utilizando o ponto '.' como separador dos centavos) a renda mensal do cliente (EX.: preencher o valor: 1500.15 equivale a R$ 1.500,15).</p></li><li><p><b>cpf: </b>preencha o cpf do cliente.</p></li><li><p><b>NOTA 3 <sup>cpf</sup>: </b>para preencher o cpf, o cliente precisa estar previamente cadastrado no microsserviço MSCLIENTES.</p></li></ul>"
+     *         "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><p><b>NOTA 1 <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p><li><p><b>renda: </b>a ser informada pelo cliente.</p></li><p><b>NOTA 2 <sup>renda</sup>: </b>preencha somente números (utilizando o ponto '.' como separador dos centavos) a renda mensal do cliente (EX.: preencher o valor: 1500.15 equivale a R$ 1.500,15).</p><li><p><b>cpf: </b>preencha o cpf do cliente.</p></li><p><b>NOTA 3 <sup>cpf</sup>: </b>para preencher o cpf, o cliente precisa estar previamente cadastrado no microsserviço MSCLIENTES.</p></ul>"
      *      ,
      *      security={{"bearerAuth": {}}},
      *      @OA\Parameter(
@@ -232,13 +232,13 @@ class AvaliadorController extends Controller {
      *    path="/msavaliador/solicitar-cartao",
      *    summary="Solicitar um cartão de crédito disponível conforme a sua renda, escolhido por um cliente cadastrado. O limite inicial, será estabelecido pelo limite básico",
      *    description=
-     *       "<p><b>Pré-condição</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><li><p><b>NOTA <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></li></ul>"
+     *       "<p><b>Pré-condição</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><p><b>NOTA <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></ul>"
      *    ,
      *    security={{"bearerAuth": {}}},
      *    @OA\RequestBody(
      *       required=true,
      *       description=
-     *          "<p><b>Pré-condição:</b></p><ul><li><p>preencher o json no corpo da requisição com os 4 dados (id do cliente, id do cartão, renda do cliente e o limite básico) obtidos no endpoint: <b>GET - Realizar uma avaliação de crédito</b> no microsserviço MSAVALIADOR.</p></li><li><p><b>NOTA 1: </b>todos os dados dos atributos do json devem ser do tipo numéricos.</p></li><li><p><b>NOTA 2: </b>todos os dados dos atributos do json devem ser maiores que o valor 0 .</p></li></ul>"
+     *          "<p><b>Pré-condição:</b></p><ul><li><p>preencher o json no corpo da requisição com os 4 dados (id do cliente, id do cartão, renda do cliente e o limite básico) obtidos no endpoint: <b>GET - Realizar uma avaliação de crédito</b> no microsserviço MSAVALIADOR.</p></li><p><b>NOTA 1: </b>todos os dados dos atributos do json devem ser do tipo numéricos.</p><p><b>NOTA 2: </b>todos os dados dos atributos do json devem ser maiores que o valor 0 .</p></ul>"
      *       ,
      *       @OA\JsonContent(
      *          required={"cliente_id", "cartao_id", "renda_cliente", "limite_basico"},
@@ -401,7 +401,7 @@ class AvaliadorController extends Controller {
      *      path="/msavaliador/cliente-cartao/{id_cliente}",
      *      summary="Buscar lista de cartões de crédito registrados junto ao cliente, através do id do cliente ",
      *      description=
-     *         "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><li><p><b>NOTA 1<sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></li><li><p><b>id_cliente: </b>informar id do cliente.</p></li><li><p><b>NOTA 2 <sup>id</sup>: </b>para preencher o id, o cliente precisa estar previamente cadastrado no microsserviço MSCLIENTES.</p></li></ul>"
+     *         "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><p><b>NOTA 1<sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p><li><p><b>id_cliente: </b>informar id do cliente.</p></li><p><b>NOTA 2 <sup>id_cliente</sup>: </b>para preencher o id, o cliente precisa estar previamente cadastrado no microsserviço MSCLIENTES.</p></ul>"
      *      ,
      *      security={{"bearerAuth": {}}},
      *      @OA\Parameter(

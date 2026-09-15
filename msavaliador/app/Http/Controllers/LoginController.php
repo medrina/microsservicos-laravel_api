@@ -26,7 +26,7 @@ class LoginController extends Controller {
      *    @OA\RequestBody(
      *       required=true,
      *       description=
-     *          "<p><b>Pré-condição:</b></p><ul><li><p>preencher o json no corpo da requisição no formato de objeto { name, email, password } .</p></li><li><p><b>NOTA 1 <sup>email</sup>: </b>não é possível cadastrar um email já existente para um novo usuário Administrador.</p></li><li><p><b>NOTA 2 <sup>email</sup>: </b>o email deve obedecer o seguinte formato de email: <b>user@email.com .</b></p></li><li><p><b>NOTA 3 <sup>password</sup>: </b>o password deve ter no mínimo 5 caracteres.</p></li></ul>"
+     *          "<p><b>Pré-condição:</b></p><ul><li><p>preencher o json no corpo da requisição no formato de objeto { name, email, password } .</p></li><p><b>NOTA 1 <sup>email</sup>: </b>não é possível cadastrar um email já existente para um novo usuário Administrador.</p><p><b>NOTA 2 <sup>email</sup>: </b>o email deve obedecer o seguinte formato de email: <b>user@email.com .</b></p><p><b>NOTA 3 <sup>password</sup>: </b>o password deve ter no mínimo 5 caracteres.</p></ul>"
      *       ,
      *       @OA\JsonContent(
      *          required={"name","email", "password"},
@@ -148,7 +148,7 @@ class LoginController extends Controller {
      *    @OA\RequestBody(
      *       required=true,
      *       description=
-     *          "<p><b>Pré-condição:</b></p><ul><li><p>usuário administrador precisa ter executado o endpoint de cadastro de usuário administrador: <b>POST - Cadastra um novo usuário Administrador...</b> no microsserviço MSAVALIADOR.</p></li><li><p><b>NOTA: </b>informar email e senha de usuário administrador que já esteja cadastrado no microsserviço MSAVALIADOR.</p></li></ul>"
+     *          "<p><b>Pré-condição:</b></p><ul><li><p>usuário administrador precisa ter executado o endpoint de cadastro de usuário administrador: <b>POST - Cadastra um novo usuário Administrador...</b> no microsserviço MSAVALIADOR.</p></li><p><b>NOTA: </b>informar email e senha de usuário administrador que já esteja cadastrado no microsserviço MSAVALIADOR.</p></ul>"
      *       ,
      *       @OA\JsonContent(
      *          required={"email", "password"},
@@ -259,7 +259,7 @@ class LoginController extends Controller {
      *    path="/msavaliador/user/update/{id}",
      *    summary="Atualizar dados (parciais) de usuário Administrador",
      *    description=
-     *       "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><li><p><b>NOTA <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></li><li><p><b>id: </b>preenchimento do id do usuário administrador.</p></li><li><p><b>NOTA 1 <sup>id</sup>: </b>o id do usuário administrador é obrigatório o seu preenchimento.</p></li><li><p><b>NOTA 2 <sup>id</sup>: </b>para preencher o id, o usuário administrador precisa estar previamente cadastrado no microsserviço MSAVALIADOR.</p></li></ul>"
+     *       "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><p><b>NOTA <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p><li><p><b>id: </b>preenchimento do id do usuário administrador.</p></li><p><b>NOTA 1 <sup>id</sup>: </b>o id do usuário administrador é obrigatório o seu preenchimento.</p><p><b>NOTA 2 <sup>id</sup>: </b>para preencher o id, o usuário administrador precisa estar previamente cadastrado no microsserviço MSAVALIADOR.</p></ul>"
      *    ,
      *    security={{"bearerAuth": {}}},
      *    @OA\Parameter(
@@ -271,7 +271,7 @@ class LoginController extends Controller {
      *    @OA\RequestBody(
      *       required=true,
      *       description=
-     *          "<p><b>Pré-condição:</b></p><ul><li><p>preenchimento de forma parcial do json no corpo da requisição no formato objeto { name, email, password } .</p></li><li><p><b>NOTA 1: </b>o preenchimento dos atributos do json não são obrigatórios. Entretanto, se forem preenchidos para serem alterados/atualizados, a API irá aplicar as regras de validação em cada atributo.</p></li><li><p><b>NOTA 2 <sup>email</sup>: </b>para atualizar o email, ele deve obedecer o seguinte formato de email: <b>user@email.com .</b></p></li><li><p><b>NOTA 3 <sup>password</sup>: </b>se o password for preenchido, ele será persistido na base de dados, porém, o novo password <u>NÃO</u> será retornado no json de resposta.</p></li><li><p><b>NOTA 4 <sup>password</sup>: </b>o novo password deve conter no mínimo 5 caracteres.</p></li></ul>"
+     *          "<p><b>Pré-condição:</b></p><ul><li><p>preenchimento de forma parcial do json no corpo da requisição no formato objeto { name, email, password } .</p></li><p><b>NOTA 1: </b>o preenchimento dos atributos do json não são obrigatórios. Entretanto, se forem preenchidos para serem alterados/atualizados, a API irá aplicar as regras de validação em cada atributo.</p><p><b>NOTA 2 <sup>email</sup>: </b>para atualizar o email, ele deve obedecer o seguinte formato de email: <b>user@email.com .</b></p><p><b>NOTA 3 <sup>password</sup>: </b>se o password for preenchido, ele será persistido na base de dados, porém, o novo password <u>NÃO</u> será retornado no json de resposta.</p><p><b>NOTA 4 <sup>password</sup>: </b>o novo password deve conter no mínimo 5 caracteres.</p></ul>"
      *       ,
      *       @OA\JsonContent(
      *          required={"name", "email", "password"},
@@ -423,7 +423,7 @@ class LoginController extends Controller {
      *    @OA\RequestBody(
      *       required=true,
      *       description=
-     *          "<p><b>Pré-condição:</b></p><ul><li><p>preencher o json no corpo da requisição no formato de objeto { name, email } .</p></li><li><p><b>NOTA 1<sup>name</sup>: </b>o name do usuário Administrador, deve estar previamente cadastrado na base de dados do microsserviço MSAVALIADOR.</p></li><li><p><b>NOTA 2<sup>email</sup>: </b>o email do usuário Administrador, deve estar previamente cadastrado na base de dados do microsserviço MSAVALIADOR.</p></li><li><p><b>NOTA 3 <sup>email</sup>: </b>para o preenchimento do email, ele deve obedecer o seguinte formato de email: <b>user@email.com</b> .</p></li></ul>"
+     *          "<p><b>Pré-condição:</b></p><ul><li><p>preencher o json no corpo da requisição no formato de objeto { name, email } .</p></li><p><b>NOTA 1<sup>name</sup>: </b>o name do usuário Administrador, deve estar previamente cadastrado na base de dados do microsserviço MSAVALIADOR.</p><p><b>NOTA 2<sup>email</sup>: </b>o email do usuário Administrador, deve estar previamente cadastrado na base de dados do microsserviço MSAVALIADOR.</p><p><b>NOTA 3 <sup>email</sup>: </b>para o preenchimento do email, ele deve obedecer o seguinte formato de email: <b>user@email.com</b> .</p></ul>"
      *       ,
      *       @OA\JsonContent(
      *          required={"name", "email"},
@@ -535,7 +535,7 @@ class LoginController extends Controller {
      *    path="/msavaliador/user/logout",
      *    summary="Deslogar usuário Administrador. Realizar logout da API (invalidar token de acesso)",
      *    description=
-     *       "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário Administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><li><p><b>NOTA <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></li><li><p><b>INFORMAÇÃO COMPLEMENTAR: </b>esse endpoint não exige parâmetros!</p></li></ul>"
+     *       "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário Administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><p><b>NOTA <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p><p><b>INFORMAÇÃO COMPLEMENTAR: </b>esse endpoint não exige parâmetros!</p></ul>"
      *    ,
      *    security={{"bearerAuth": {}}},
      *    @OA\Response(

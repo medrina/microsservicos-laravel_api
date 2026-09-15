@@ -22,7 +22,7 @@ class CartaoController extends Controller {
      *    path="/mscartoes/cartoes",
      *    summary="Buscar lista de cartões de crédito cadastrados ",
      *    description=
-     *       "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><li><p><b>NOTA <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></li><li><p><b>INFORMAÇÃO COMPLEMENTAR: </b>esse endpoint não exige parâmetros!</p></li></ul>"
+     *       "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><p><b>NOTA <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p><p><b>INFORMAÇÃO COMPLEMENTAR: </b>esse endpoint não exige parâmetros!</p></ul>"
      *    ,
      *    security={{"bearerAuth": {}}},
      *    @OA\Response(
@@ -97,13 +97,13 @@ class CartaoController extends Controller {
      *    path="/mscartoes/cartoes",
      *    summary="Cadastrar novo cartão de crédito",
      *    description=
-     *       "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><li><p><b>NOTA <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></li></ul>"
+     *       "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><p><b>NOTA <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></ul>"
      *    ,
      *    security={{"bearerAuth": {}}},
      *    @OA\RequestBody(
      *       required=true,
      *       description=
-     *          "Dados do cartão<p><b>Pré-condição</b></p><ul><li><p>os dados do cartão devem ser preenchidos no corpo da requisição (dentro do json).</p></li><li><p><b>NOTA 1 <sup>nome</sup>: </b>o nome do cartão possui limite máximo de até 50 caracteres.</p></li><li><p><b>NOTA 2 <sup>bandeira</sup>: </b>o nome da bandeira a ser preenchido é do tipo <i>enumerado</i>, e as bandeiras estão definidas na opção <b>Schema</b>. Qualquer nome de bandeira que seja diferente das opções do tipo enumerado, a API retornará um erro de validação cód HTTP 422 .</p></li><li><p><b>NOTA 3 <sup>renda</sup>: </b>preencha somente com números (utilizando o ponto '.' como separador dos centavos) a renda do cartão (EX.: preencher o valor 1500.00 no atributo renda, equivale ao valor R$ 1.500,00).</p></li></ul>"
+     *          "Dados do cartão<p><b>Pré-condição</b></p><ul><li><p>os dados do cartão devem ser preenchidos no corpo da requisição (dentro do json).</p></li><p><b>NOTA 1 <sup>nome</sup>: </b>o nome do cartão possui limite máximo de até 50 caracteres.</p><p><b>NOTA 2 <sup>bandeira</sup>: </b>o nome da bandeira a ser preenchido é do tipo <i>enumerado</i>, e as bandeiras estão definidas na opção <b>Schema</b>. Qualquer nome de bandeira que seja diferente das opções do tipo enumerado, a API retornará um erro de validação cód HTTP 422 .</p><p><b>NOTA 3 <sup>renda</sup>: </b>preencha somente com números (utilizando o ponto '.' como separador dos centavos) a renda do cartão (EX.: preencher o valor 1500.00 no atributo renda, equivale ao valor R$ 1.500,00).</p></ul>"
      *       ,
      *       @OA\JsonContent(
      *          required={"nome", "bandeira", "renda"},
@@ -258,7 +258,7 @@ class CartaoController extends Controller {
      *    path="/mscartoes/cartoes/{id}",
      *    summary="Retornar cartão pelo id ",
      *    description=
-     *       "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><li><p><b>NOTA 1 <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></li><li><p><b>id: </b>informar id do cartão de crédito.</p></li><li><p><b>NOTA 2 <sup>id</sup>: </b>para preencher o id, o cartão de crédito precisa estar previamente cadastrado no microsserviço MSCARTOES.</p></li></ul>"
+     *       "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><p><b>NOTA 1 <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p><li><p><b>id: </b>informar id do cartão de crédito.</p></li><p><b>NOTA 2 <sup>id</sup>: </b>para preencher o id, o cartão de crédito precisa estar previamente cadastrado no microsserviço MSCARTOES.</p></ul>"
      *    ,
      *    security={{"bearerAuth": {}}},
      *    @OA\Parameter(
@@ -360,7 +360,7 @@ class CartaoController extends Controller {
      *    path="/mscartoes/cartoes/{id}",
      *    summary="Atualizar dados (parciais) de cartão de crédito",
      *    description=
-     *       "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><li><p><b>NOTA 1 <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p></li><li><p><b>id: </b>informar id do cartão de crédito.</p></li><li><p><b>NOTA 2 <sup>id</sup>: </b>para preencher o id, o cartão de crédito precisa estar previamente cadastrado no microsserviço MSCARTOES.</p></li></ul>"
+     *       "<p><b>Pré-condição:</b></p><ul><li><p><b>token: </b>usuário administrador deve estar autenticado, e possuir um token válido (obtido no endpoint <b>POST - Efetuar login de usuário Administrador...</b> no microsserviço MSAVALIADOR).</p></li><p><b>NOTA 1 <sup>token</sup>: </b>o token deverá ser preenchido no ícone do cadeado desse endpoint. Após preencher o token no campo <i>Value</i>, clique no botão <i>Authorize</i> e esse endpoint estará autorizado para a plena execução.</p><li><p><b>id: </b>informar id do cartão de crédito.</p></li><p><b>NOTA 2 <sup>id</sup>: </b>para preencher o id, o cartão de crédito precisa estar previamente cadastrado no microsserviço MSCARTOES.</p></ul>"
      *    ,
      *    security={{"bearerAuth": {}}},
      *    @OA\Parameter(
@@ -372,7 +372,7 @@ class CartaoController extends Controller {
      *    @OA\RequestBody(
      *       required=true,
      *       description=
-     *          "<p><b>Pré-condição:</b></p><ul><li><p>preenchimento de forma parcial do json no corpo da requisição (nome, bandeira, renda).</p></li><li><p><b>NOTA 1: </b>o preenchimento dos atributos do json não são obrigatórios. Entretanto, se forem preenchidos para serem alterados/atualizados, a API irá aplicar as regras de validação em cada atributo.</p></li><li><p><b>NOTA 2 <sup>bandeira</sup>: </b>o nome da bandeira é do tipo enumerado, e as bandeiras estão definidas na opção <b>Schema .</b></p></li><li><p><b>NOTA 3 <sup>renda</sup>: </b>preencha somente com números (utilizando o ponto '.' como separador dos centavos) a renda do cartão (EX.: preencher o valor 1500.00 no atributo renda, equivale ao valor R$ 1.500,00).</p></li><li><p><b>INFORMAÇÃO COMPLEMENTAR: </b>não preenchendo os atributos no corpo da requisição, será retornado um json de resposta contendo os dados do cartão.</li></ul>"
+     *          "<p><b>Pré-condição:</b></p><ul><li><p>preenchimento de forma parcial do json no corpo da requisição (nome, bandeira, renda).</p></li><p><b>NOTA 1: </b>o preenchimento dos atributos do json não são obrigatórios. Entretanto, se forem preenchidos para serem alterados/atualizados, a API irá aplicar as regras de validação em cada atributo.</p><p><b>NOTA 2 <sup>bandeira</sup>: </b>o nome da bandeira é do tipo enumerado, e as bandeiras estão definidas na opção <b>Schema .</b></p><p><b>NOTA 3 <sup>renda</sup>: </b>preencha somente com números (utilizando o ponto '.' como separador dos centavos) a renda do cartão (EX.: preencher o valor 1500.00 no atributo renda, equivale ao valor R$ 1.500,00).</p><p><b>INFORMAÇÃO COMPLEMENTAR: </b>não preenchendo os atributos no corpo da requisição, será retornado um json de resposta contendo os dados do cartão.</ul>"
      *       ,
      *       @OA\JsonContent(
      *          required={"nome", "bandeira", "renda"},
