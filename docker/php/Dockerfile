@@ -40,7 +40,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Diretório da aplicação
 WORKDIR /var/www
 
-# oculta a versão do PHP do cabeçalho de resposta da requisição HTTP
+# aplica algumas configurações customizadas diferentes das configurações padrão do arquivo php.ini
 COPY docker/php/custom-php.ini /usr/local/etc/php/conf.d/custom-php.ini
 RUN chmod +x /usr/local/etc/php/conf.d/custom-php.ini
 
