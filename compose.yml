@@ -1,6 +1,19 @@
+# Âncora de configuração: Define o limite global de logs. Definição do modelo padrão de logs (30MB no máximo por container)
+x-logging: &default-logging
+  logging:
+    driver: "json-file"
+    options:
+      max-size: "10m"  # Cada arquivo de log terá no máximo 10 Megabytes
+      max-file: "3"    # Mantém no máximo 3 arquivos (rotatividade). Total: 30MB por contêiner.
+
 # MICROSSERVIÇO MSCLIENTES
 services:
   msclientes:
+    <<: *default-logging # Aplica o limite de logs aqui também
+    deploy:
+      resources:
+        limits:
+          memory: 256M # estabelece limite de memória do container do microsserviço MSCLIENTES
     environment:
       - COMPOSER_PROCESS_TIMEOUT=0
     build:
@@ -22,6 +35,11 @@ services:
 #--------------------------------------------------------------------------------
 # MICROSSERVIÇO MSCARTOES
   mscartoes:
+    <<: *default-logging # Aplica o limite de logs aqui também
+    deploy:
+      resources:
+        limits:
+          memory: 256M # estabelece limite de memória do container do microsserviço MSCARTOES
     environment:
       - COMPOSER_PROCESS_TIMEOUT=0
     build:
@@ -43,6 +61,11 @@ services:
 #--------------------------------------------------------------------------------
 # MICROSSERVIÇO MSAVALIADOR
   msavaliador:
+    <<: *default-logging # Aplica o limite de logs aqui também
+    deploy:
+      resources:
+        limits:
+          memory: 256M # estabelece limite de memória do container do microsserviço MSAVALIADOR
     environment:
       - COMPOSER_PROCESS_TIMEOUT=0
     build:
@@ -65,6 +88,11 @@ services:
 # SERVIDOR WEB NGINX
   nginx:
     image: nginx:alpine
+    <<: *default-logging # Aplica o limite de logs declarado globalmente no início do código
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     container_name: nginx
     restart: unless-stopped
     ports:
@@ -84,6 +112,7 @@ services:
 # SERVIÇO DE MENSAGERIA
   rabbitmq:
     image: rabbitmq:4.3.1-management-alpine
+    <<: *default-logging # Protege contra o alto volume de conexões/filas
     container_name: rabbitmq
     ports: 
       - "5672:5672"
@@ -91,6 +120,10 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     volumes:
       - mariadb_rabbitmq_data:/var/lib/rabbitmq
       - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
@@ -102,6 +135,12 @@ services:
 # SERVIÇO DE CACHE DE TOKENS JWT INVÁLIDOS EM MEMÓRIA
   redis:
     image: redis:alpine
+    <<: *default-logging # Aplica o limite de logs aqui também
+    command: redis-server --maxmemory 100mb --maxmemory-policy allkeys-lru # limite interno de memória do Redis = 100 MB
+    deploy:
+      resources:
+        limits:
+          memory: 128M # limite de memória do container
     container_name: redis
     ports:
       - "6379:6379"
@@ -111,6 +150,12 @@ services:
 # BANCO DE DADOS DO MICROSSERVIÇO MSCLIENTES
   db_msclientes:
     image: mariadb:12.3
+    <<: *default-logging # Protege contra abuso de logs de query/erros
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.50'
     container_name: db_msclientes
     restart: unless-stopped
     environment:
@@ -134,6 +179,12 @@ services:
 # BANCO DE DADOS DO MICROSSERVIÇO MSCARTOES
   db_mscartoes:
     image: mariadb:12.3
+    <<: *default-logging # Protege contra abuso de logs de query/erros
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.50'
     container_name: db_mscartoes
     restart: unless-stopped
     environment:
@@ -157,6 +208,12 @@ services:
 # BANCO DE DADOS DO MICROSSERVIÇO MSAVALIADOR
   db_msavaliador:
     image: mariadb:12.3
+    <<: *default-logging # Protege contra abuso de logs de query/erros
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.50'
     container_name: db_msavaliador
     restart: unless-stopped
     environment:
