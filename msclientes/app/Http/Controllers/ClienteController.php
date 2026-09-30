@@ -1012,6 +1012,7 @@ class ClienteController extends Controller {
 
     // abaixo seguem os métodos que são acessados e executados por outros microsserviços: esses métodos NÃO estão disponíveis nos endpoints do microsserviço MSCLIENTES
 
+    // acessado pelo MICROSSERVIÇO MSAVALIADOR
     // retorna um cliente pelo seu id (microsserviço MSAVALIADOR)
     public function getCliente(Request $request) {
         $request->validate([
@@ -1040,7 +1041,7 @@ class ClienteController extends Controller {
     }
     //----------------------------------------------------------------------------------------------------------
 
-    // endpoint executado pelo microsserviço MSAVALIADOR
+    // acessado pelo MICROSSERVIÇO MSAVALIADOR
     // retorna um cliente pelo seu CPF
     public function getClienteByCPF(Request $request) {
         $request->validate([
