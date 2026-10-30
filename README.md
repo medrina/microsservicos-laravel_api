@@ -8,7 +8,7 @@ A API foi desenvolvida sob uma arquitetura de 3 microsserviços, são eles:
 # Tecnologias
 Abaixo seguem os dados técnicos da API:
 - Ambiente de execução: Docker
-- Microsserviços: Framework Laravel 12 sendo executado sob a linguagem de programação PHP 8.3
+- Microsserviços: Framework Laravel 12 sendo executado sob a linguagem de programação PHP 8.3.36 (versão de segurança já atualizada PHP2Shell)
 - Nginx: Servidor Web sendo utilizado como proxy reverso para os 3 microsserviços;
 - MariaDB: Banco de dados de cada microsserviço;
 - RabbitMQ: Broker de mensageria para armazenamento temporário das solicitações de cartão de crédito;
@@ -272,7 +272,7 @@ async function atualizarUsuarioAdm() {
         'password': ''
     }
 
-    // elaboração e envio da requisição HTTP ao endpoint Cadastrar Usuário Administrador
+    // elaboração e envio da requisição HTTP ao endpoint Atualizar Usuário Administrador
     const resposta = await fetch(`http://localhost:8000/msavaliador/user/update/${id}`, { 
         method: 'PATCH',
         body: JSON.stringify(obj),
